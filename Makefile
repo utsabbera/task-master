@@ -1,4 +1,4 @@
-.PHONY: build test clean lint fmt deps run update-env install-hooks hooks help
+.PHONY: build test clean lint fmt deps run update-env install-hooks hooks help test-pretty test-short test-verbose test-watch
 
 # Binary name
 BINARY_NAME=task-master
@@ -15,9 +15,9 @@ build:
 	mkdir -p $(BIN_DIR)
 	go build -o $(BIN_DIR)/$(BINARY_NAME) $(CMD_DIR)
 
-# Run tests
+# Run tests with standard output
 test:
-	go test ./...
+	gotestsum -- ./...
 
 # Run linter
 lint:
@@ -59,13 +59,13 @@ hooks:
 # Help target
 help:
 	@echo "Available targets:"
-	@echo "  build      - Build the application"
-	@echo "  test       - Run tests"
-	@echo "  lint       - Run linter"
-	@echo "  fmt        - Format code"
-	@echo "  clean      - Remove build artifacts"
-	@echo "  deps       - Install dependencies"
-	@echo "  run        - Build and run the application"
-	@echo "  update-env - Reload direnv environment"
+	@echo "  build         - Build the application"
+	@echo "  test          - Run tests using gotestsum"
+	@echo "  lint          - Run linter"
+	@echo "  fmt           - Format code"
+	@echo "  clean         - Remove build artifacts"
+	@echo "  deps          - Install dependencies"
+	@echo "  run           - Build and run the application"
+	@echo "  update-env    - Reload direnv environment"
 	@echo "  install-hooks - Install git hooks with Lefthook"
-	@echo "  hooks      - Run git hooks manually"
+	@echo "  hooks         - Run git hooks manually"

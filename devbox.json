@@ -1,5 +1,10 @@
 {
-  "packages": ["go@1.24.3", "golangci-lint@2.1.6", "lefthook@1.6.5"],
+  "packages": [
+    "go@1.24.3",
+    "golangci-lint@2.1.6",
+    "lefthook@1.6.5",
+    "gotestsum@1.11.0"
+  ],
   "shell": {
     "init_hook": [
       "echo 'Welcome to your Task Master development environment!'",

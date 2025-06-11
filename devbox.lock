@@ -101,6 +101,54 @@
         }
       }
     },
+    "gotestsum@1.11.0": {
+      "last_modified": "2024-09-10T15:01:03Z",
+      "resolved": "github:NixOS/nixpkgs/5ed627539ac84809c78b2dd6d26a5cebeb5ae269#gotestsum",
+      "source": "devbox-search",
+      "version": "1.11.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/gkq6wldjndpcgg3vx4la6dpp0sgmqm4y-gotestsum-1.11.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/gkq6wldjndpcgg3vx4la6dpp0sgmqm4y-gotestsum-1.11.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/dqj7agwyi9h11hd3775dnn66lzi5w8x2-gotestsum-1.11.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/dqj7agwyi9h11hd3775dnn66lzi5w8x2-gotestsum-1.11.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/f5dph9gaf4d1xni7ysdvr76i86b8p85l-gotestsum-1.11.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/f5dph9gaf4d1xni7ysdvr76i86b8p85l-gotestsum-1.11.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/d6wki0gr4y5b3442x496hqbnxbyd16px-gotestsum-1.11.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/d6wki0gr4y5b3442x496hqbnxbyd16px-gotestsum-1.11.0"
+        }
+      }
+    },
     "lefthook@1.6.5": {
       "last_modified": "2024-03-08T13:51:52Z",
       "resolved": "github:NixOS/nixpkgs/a343533bccc62400e8a9560423486a3b6c11a23b#lefthook",
