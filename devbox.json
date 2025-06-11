@@ -1,0 +1,10 @@
+{
+  "packages": ["go@1.24.3", "golangci-lint@2.1.6", "lefthook@1.6.5"],
+  "shell": {
+    "init_hook": [
+      "echo 'Welcome to your Task Master development environment!'",
+      "echo 'Use make commands for building, testing, and other tasks.'",
+      "echo 'Run `make help` for a list of available commands.'"
+    ]
+  }
+}

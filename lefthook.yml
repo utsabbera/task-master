@@ -1,0 +1,19 @@
+# lefthook.yml for Task Master project
+
+# Define pre-commit hooks
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: "*.go"
+      run: golangci-lint run --fix
+    test:
+      run: go test ./...
+
+# Define pre-push hooks
+pre-push:
+  commands:
+    test-all:
+      run: go test ./... -race
+    lint-all:
+      run: golangci-lint run

@@ -30,3 +30,14 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Devbox
+.devbox/
+
+# Direnv
+.direnv/
+.envrc.local
+
+# Lefthook
+.lefthook-local/
+lefthook-local.json
