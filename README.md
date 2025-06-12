@@ -57,7 +57,7 @@ This project uses [Lefthook](https://github.com/evilmartians/lefthook) to manage
 After cloning the repository, install the Git hooks:
 
 ```bash
-make install-hooks
+make hooks
 ```
 
 #### Available Hooks
@@ -65,15 +65,7 @@ make install-hooks
 - **pre-commit**: Runs linting and tests before each commit
 - **pre-push**: Runs comprehensive tests with race detection before pushing
 
-#### Manual Run
-
-You can manually run the hooks with:
-
-```bash
-make hooks
-```
-
-or run a specific hook:
+#### Run a specific hook:
 
 ```bash
 lefthook run pre-commit

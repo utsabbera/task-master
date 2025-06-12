@@ -1,4 +1,4 @@
-.PHONY: build test clean lint fmt deps run update-env install-hooks hooks help test-pretty test-short test-verbose test-watch
+.PHONY: help build test clean lint fmt deps run env hooks
 
 # Binary name
 BINARY_NAME=task-master
@@ -42,12 +42,12 @@ run: build
 	$(BIN_DIR)/$(BINARY_NAME)
 
 # Update environment
-update-env:
+env:
 	@echo "Updating direnv environment..."
 	@direnv reload
 
 # Install and setup git hooks with Lefthook
-install-hooks:
+hooks:
 	@echo "Installing git hooks with Lefthook..."
 	lefthook install
 
@@ -55,17 +55,21 @@ install-hooks:
 hooks:
 	@echo "Running git hooks manually..."
 	lefthook run pre-commit
+	
+# Generate mocks
+generate-mocks:
+	@echo "Generating mocks..."
+	go generate ./pkg/...
 
 # Help target
 help:
 	@echo "Available targets:"
-	@echo "  build         - Build the application"
-	@echo "  test          - Run tests using gotestsum"
-	@echo "  lint          - Run linter"
-	@echo "  fmt           - Format code"
-	@echo "  clean         - Remove build artifacts"
-	@echo "  deps          - Install dependencies"
-	@echo "  run           - Build and run the application"
-	@echo "  update-env    - Reload direnv environment"
-	@echo "  install-hooks - Install git hooks with Lefthook"
-	@echo "  hooks         - Run git hooks manually"
+	@echo "  build - Build the application"
+	@echo "  test  - Run tests using gotestsum"
+	@echo "  lint  - Run linter"
+	@echo "  fmt   - Format code"
+	@echo "  clean - Remove build artifacts"
+	@echo "  deps  - Install dependencies"
+	@echo "  run   - Build and run the application"
+	@echo "  env   - Reload direnv environment"
+	@echo "  hooks - Install git hooks with Lefthook"
