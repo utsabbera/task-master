@@ -1,10 +1,11 @@
 ## Features:
 
 - [ ] Implement handlers - call service methods
+- [ ] Add API request validation mechanism
 
 ## Refactor:
 
-- [ ] Rename service and repository methods to make it consistent all accross
+- [x] Rename service and repository methods to make it consistent all accross
 
 ## Improvements:
 

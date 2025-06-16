@@ -5,21 +5,40 @@ import (
 	"time"
 )
 
-// Service provides business logic for task management operations
-type Service struct {
+//go:generate mockgen -destination=mock_service.go -package=core . Service
+
+// Service defines the interface for task management operations
+type Service interface {
+	// Create adds a new task with the specified title, description, priority, and optional due date
+	Create(title, description string, priority Priority, dueDate *time.Time) (*Task, error)
+
+	// Get retrieves a task by its ID
+	Get(id string) (*Task, error)
+
+	// List returns all tasks stored in the repository
+	List() ([]*Task, error)
+
+	// Update modifies an existing task in the repository
+	Update(task *Task) error
+
+	// Delete removes a task from the repository by its ID
+	Delete(id string) error
+}
+
+type service struct {
 	repo Repository
 }
 
 // NewService creates a new task service with the provided repository
-func NewService(repo Repository) *Service {
-	return &Service{
+func NewService(repo Repository) Service {
+	return &service{
 		repo: repo,
 	}
 }
 
-// CreateTask creates a new task with the provided details
+// Create creates a new task with the provided details
 // Returns an error if the title is empty or if there's an issue with the repository
-func (s *Service) CreateTask(title, description string, priority Priority, dueDate *time.Time) (*Task, error) {
+func (s *service) Create(title, description string, priority Priority, dueDate *time.Time) (*Task, error) {
 	if title == "" {
 		return nil, fmt.Errorf("title cannot be empty")
 	}
@@ -34,14 +53,14 @@ func (s *Service) CreateTask(title, description string, priority Priority, dueDa
 	return task, nil
 }
 
-// GetTask retrieves a task by its ID
+// Get retrieves a task by its ID
 // Returns an error if the ID is empty or if the task cannot be found
-func (s *Service) GetTask(id string) (*Task, error) {
+func (s *service) Get(id string) (*Task, error) {
 	if id == "" {
 		return nil, fmt.Errorf("task ID cannot be empty")
 	}
 
-	task, err := s.repo.FindByID(id)
+	task, err := s.repo.Get(id)
 	if err != nil {
 		return nil, fmt.Errorf("finding task: %w", err)
 	}
@@ -49,9 +68,9 @@ func (s *Service) GetTask(id string) (*Task, error) {
 	return task, nil
 }
 
-// GetAllTasks retrieves all tasks from the repository
-func (s *Service) GetAllTasks() ([]*Task, error) {
-	tasks, err := s.repo.FindAll()
+// List retrieves all tasks from the repository
+func (s *service) List() ([]*Task, error) {
+	tasks, err := s.repo.List()
 	if err != nil {
 		return nil, fmt.Errorf("retrieving tasks: %w", err)
 	}
@@ -59,9 +78,9 @@ func (s *Service) GetAllTasks() ([]*Task, error) {
 	return tasks, nil
 }
 
-// UpdateTask updates an existing task in the repository
+// Update updates an existing task in the repository
 // Returns ErrInvalidTask if the task is nil
-func (s *Service) UpdateTask(task *Task) error {
+func (s *service) Update(task *Task) error {
 	if task == nil {
 		return ErrInvalidTask
 	}
@@ -74,9 +93,9 @@ func (s *Service) UpdateTask(task *Task) error {
 	return nil
 }
 
-// DeleteTask removes a task from the repository by its ID
+// Delete removes a task from the repository by its ID
 // Returns an error if the ID is empty or if the task cannot be found
-func (s *Service) DeleteTask(id string) error {
+func (s *service) Delete(id string) error {
 	if id == "" {
 		return fmt.Errorf("task ID cannot be empty")
 	}
@@ -84,24 +103,6 @@ func (s *Service) DeleteTask(id string) error {
 	err := s.repo.Delete(id)
 	if err != nil {
 		return fmt.Errorf("deleting task: %w", err)
-	}
-
-	return nil
-}
-
-// UpdateTaskStatus changes the status of a task with the specified ID
-// Returns an error if the task cannot be found or updated
-func (s *Service) UpdateTaskStatus(id string, status Status) error {
-	task, err := s.repo.FindByID(id)
-	if err != nil {
-		return fmt.Errorf("finding task: %w", err)
-	}
-
-	task.Status = status
-
-	err = s.repo.Update(task)
-	if err != nil {
-		return fmt.Errorf("updating task status: %w", err)
 	}
 
 	return nil

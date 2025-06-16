@@ -6,6 +6,7 @@ import (
 	"github.com/utsabbera/task-master/pkg/middleware"
 )
 
+// ServerConfig holds the configuration for the API server.
 type ServerConfig struct {
 	Addr string
 }

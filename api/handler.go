@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-// CreateTask godoc
+// Create godoc
 // @Summary Create a new task
 // @Description Create a new task
 // @Tags tasks
@@ -17,7 +17,7 @@ func (h *taskHandler) Create(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "not implemented", http.StatusNotImplemented)
 }
 
-// GetTask godoc
+// Get godoc
 // @Summary Get a task by ID
 // @Description Get a task by ID
 // @Tags tasks
@@ -30,7 +30,7 @@ func (h *taskHandler) Get(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "not implemented", http.StatusNotImplemented)
 }
 
-// ListTasks godoc
+// List godoc
 // @Summary List all tasks
 // @Description List all tasks
 // @Tags tasks
@@ -41,7 +41,7 @@ func (h *taskHandler) List(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "not implemented", http.StatusNotImplemented)
 }
 
-// UpdateTask godoc
+// Update godoc
 // @Summary Update a task by ID
 // @Description Update a task by ID
 // @Tags tasks
@@ -56,7 +56,7 @@ func (h *taskHandler) Update(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "not implemented", http.StatusNotImplemented)
 }
 
-// DeleteTask godoc
+// Delete godoc
 // @Summary Delete a task by ID
 // @Description Delete a task by ID
 // @Tags tasks
@@ -68,6 +68,7 @@ func (h *taskHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "not implemented", http.StatusNotImplemented)
 }
 
+// Handler defines the interface for handling HTTP requests related to tasks.
 type Handler interface {
 	Create(w http.ResponseWriter, r *http.Request)
 	Get(w http.ResponseWriter, r *http.Request)
@@ -79,6 +80,7 @@ type Handler interface {
 type taskHandler struct {
 }
 
+// NewHandler returns a new instance of Handler for task operations.
 func NewHandler() Handler {
 	return &taskHandler{}
 }

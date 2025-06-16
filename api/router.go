@@ -18,6 +18,7 @@ func newTaskRouter(handler Handler, middlewares ...middleware.Middleware) http.H
 	return middleware.Bind(router, middlewares...)
 }
 
+// NewRouter creates the main HTTP router for the API.
 func NewRouter(handler Handler, middlewares ...middleware.Middleware) http.Handler {
 
 	router := http.NewServeMux()

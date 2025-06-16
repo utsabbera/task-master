@@ -21,12 +21,16 @@ var (
 type Repository interface {
 	// Create stores a new task in the repository and assigns it a unique ID
 	Create(task *Task) error
-	// FindByID retrieves a task by its ID
-	FindByID(id string) (*Task, error)
-	// FindAll returns all tasks stored in the repository
-	FindAll() ([]*Task, error)
+
+	// Get retrieves a task by its ID
+	Get(id string) (*Task, error)
+
+	// List returns all tasks stored in the repository
+	List() ([]*Task, error)
+
 	// Update modifies an existing task in the repository
 	Update(task *Task) error
+
 	// Delete removes a task from the repository
 	Delete(id string) error
 }
@@ -72,9 +76,9 @@ func (r *MemoryRepository) Create(t *Task) error {
 	return nil
 }
 
-// FindByID retrieves a task by its ID from memory
+// Get retrieves a task by its ID from memory
 // Returns ErrTaskNotFound if the task doesn't exist
-func (r *MemoryRepository) FindByID(id string) (*Task, error) {
+func (r *MemoryRepository) Get(id string) (*Task, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
@@ -86,8 +90,8 @@ func (r *MemoryRepository) FindByID(id string) (*Task, error) {
 	return t, nil
 }
 
-// FindAll returns all tasks stored in memory as a slice
-func (r *MemoryRepository) FindAll() ([]*Task, error) {
+// List returns all tasks stored in memory as a slice
+func (r *MemoryRepository) List() ([]*Task, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 

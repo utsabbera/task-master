@@ -34,7 +34,7 @@ func TestMemoryRepository_Create(t *testing.T) {
 		assert.NotEmpty(t, task.UpdatedAt)
 		assert.Equal(t, task.CreatedAt, task.UpdatedAt)
 
-		storedTask, err := repo.FindByID("A")
+		storedTask, err := repo.Get("A")
 		require.NoError(t, err)
 		assert.Equal(t, task, storedTask)
 	})
@@ -61,13 +61,13 @@ func TestMemoryRepository_Create(t *testing.T) {
 		assert.NotEmpty(t, task.CreatedAt)
 		assert.NotEmpty(t, task.UpdatedAt)
 
-		storedTask, err := repo.FindByID("CUSTOM-ID")
+		storedTask, err := repo.Get("CUSTOM-ID")
 		require.NoError(t, err)
 		assert.Equal(t, task, storedTask)
 	})
 }
 
-func TestMemoryRepository_FindByID(t *testing.T) {
+func TestMemoryRepository_Get(t *testing.T) {
 	t.Run("should return task with matching ID", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -79,7 +79,7 @@ func TestMemoryRepository_FindByID(t *testing.T) {
 		task := NewTask("Test Task", "Description", PriorityMedium, nil)
 		require.NoError(t, repo.Create(task))
 
-		result, err := repo.FindByID(task.ID)
+		result, err := repo.Get(task.ID)
 
 		require.NoError(t, err)
 		assert.Equal(t, task, result)
@@ -93,7 +93,7 @@ func TestMemoryRepository_FindByID(t *testing.T) {
 
 		repo := NewMemoryRepository(mockGen)
 
-		result, err := repo.FindByID("non-existent")
+		result, err := repo.Get("non-existent")
 
 		assert.Error(t, err)
 		assert.ErrorIs(t, err, ErrTaskNotFound)
@@ -101,7 +101,7 @@ func TestMemoryRepository_FindByID(t *testing.T) {
 	})
 }
 
-func TestMemoryRepository_FindAll(t *testing.T) {
+func TestMemoryRepository_List(t *testing.T) {
 	t.Run("should return all tasks", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -117,7 +117,7 @@ func TestMemoryRepository_FindAll(t *testing.T) {
 		require.NoError(t, repo.Create(task1))
 		require.NoError(t, repo.Create(task2))
 
-		results, err := repo.FindAll()
+		results, err := repo.List()
 
 		require.NoError(t, err)
 		assert.Len(t, results, 2)
@@ -144,7 +144,7 @@ func TestMemoryRepository_FindAll(t *testing.T) {
 
 		repo := NewMemoryRepository(mockGen)
 
-		results, err := repo.FindAll()
+		results, err := repo.List()
 
 		require.NoError(t, err)
 		assert.Empty(t, results)
@@ -175,7 +175,7 @@ func TestMemoryRepository_Update(t *testing.T) {
 
 		require.NoError(t, err)
 
-		updated, err := repo.FindByID(task.ID)
+		updated, err := repo.Get(task.ID)
 		require.NoError(t, err)
 		assert.Equal(t, "Updated Title", updated.Title)
 		assert.Equal(t, StatusInProgress, updated.Status)
@@ -217,7 +217,7 @@ func TestMemoryRepository_Delete(t *testing.T) {
 		err := repo.Delete(taskID)
 		require.NoError(t, err)
 
-		_, err = repo.FindByID(taskID)
+		_, err = repo.Get(taskID)
 		assert.ErrorIs(t, err, ErrTaskNotFound)
 	})
 

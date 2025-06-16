@@ -9,7 +9,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestCreateTask(t *testing.T) {
+func TestService_Create(t *testing.T) {
 	t.Run("should create task with valid data", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -29,7 +29,7 @@ func TestCreateTask(t *testing.T) {
 				return nil
 			})
 
-		task, err := service.CreateTask("Test Task", "Description", PriorityMedium, nil)
+		task, err := service.Create("Test Task", "Description", PriorityMedium, nil)
 
 		assert.NoError(t, err)
 		assert.Equal(t, "TEST-ID", task.ID)
@@ -46,7 +46,7 @@ func TestCreateTask(t *testing.T) {
 
 		// No expectations on mockRepo as it should not be called
 
-		task, err := service.CreateTask("", "Description", PriorityMedium, nil)
+		task, err := service.Create("", "Description", PriorityMedium, nil)
 
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "empty")
@@ -70,7 +70,7 @@ func TestCreateTask(t *testing.T) {
 			})).
 			Return(repoErr)
 
-		task, err := service.CreateTask("Test Task", "Description", PriorityMedium, nil)
+		task, err := service.Create("Test Task", "Description", PriorityMedium, nil)
 
 		assert.Error(t, err)
 		assert.Nil(t, task)
@@ -78,7 +78,7 @@ func TestCreateTask(t *testing.T) {
 	})
 }
 
-func TestGetTask(t *testing.T) {
+func TestService_Get(t *testing.T) {
 	t.Run("should get task with valid ID", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -88,10 +88,10 @@ func TestGetTask(t *testing.T) {
 		expectedTask := &Task{ID: "TEST-ID", Title: "Test Task"}
 
 		mockRepo.EXPECT().
-			FindByID("TEST-ID").
+			Get("TEST-ID").
 			Return(expectedTask, nil)
 
-		task, err := service.GetTask("TEST-ID")
+		task, err := service.Get("TEST-ID")
 
 		assert.NoError(t, err)
 		assert.Equal(t, expectedTask, task)
@@ -106,7 +106,7 @@ func TestGetTask(t *testing.T) {
 
 		// No expectations on mockRepo as it should not be called
 
-		task, err := service.GetTask("")
+		task, err := service.Get("")
 
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "empty")
@@ -121,17 +121,17 @@ func TestGetTask(t *testing.T) {
 		service := NewService(mockRepo)
 
 		mockRepo.EXPECT().
-			FindByID("TEST-ID").
+			Get("TEST-ID").
 			Return(nil, ErrTaskNotFound)
 
-		task, err := service.GetTask("TEST-ID")
+		task, err := service.Get("TEST-ID")
 
 		assert.Error(t, err)
 		assert.Nil(t, task)
 	})
 }
 
-func TestGetAllTasks(t *testing.T) {
+func TestService_List(t *testing.T) {
 	t.Run("should return all tasks from repository", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -144,10 +144,10 @@ func TestGetAllTasks(t *testing.T) {
 		}
 
 		mockRepo.EXPECT().
-			FindAll().
+			List().
 			Return(tasks, nil)
 
-		result, err := service.GetAllTasks()
+		result, err := service.List()
 
 		assert.NoError(t, err)
 		assert.Equal(t, tasks, result)
@@ -162,17 +162,17 @@ func TestGetAllTasks(t *testing.T) {
 		repoErr := errors.New("database error")
 
 		mockRepo.EXPECT().
-			FindAll().
+			List().
 			Return(nil, repoErr)
 
-		tasks, err := service.GetAllTasks()
+		tasks, err := service.List()
 
 		assert.Error(t, err)
 		assert.Nil(t, tasks)
 	})
 }
 
-func TestUpdateTask(t *testing.T) {
+func TestService_Update(t *testing.T) {
 	t.Run("should update valid task", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -185,7 +185,7 @@ func TestUpdateTask(t *testing.T) {
 			Update(task).
 			Return(nil)
 
-		err := service.UpdateTask(task)
+		err := service.Update(task)
 
 		assert.NoError(t, err)
 	})
@@ -208,7 +208,7 @@ func TestUpdateTask(t *testing.T) {
 			})).
 			Return(nil)
 
-		err := service.UpdateTask(task)
+		err := service.Update(task)
 
 		assert.NoError(t, err)
 	})
@@ -222,7 +222,7 @@ func TestUpdateTask(t *testing.T) {
 
 		// No expectations on mockRepo as it should not be called
 
-		err := service.UpdateTask(nil)
+		err := service.Update(nil)
 
 		assert.ErrorIs(t, err, ErrInvalidTask)
 	})
@@ -243,13 +243,13 @@ func TestUpdateTask(t *testing.T) {
 			})).
 			Return(repoErr)
 
-		err := service.UpdateTask(task)
+		err := service.Update(task)
 
 		assert.Error(t, err)
 	})
 }
 
-func TestDeleteTask(t *testing.T) {
+func TestService_Delete(t *testing.T) {
 	t.Run("should delete task with valid ID", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -261,7 +261,7 @@ func TestDeleteTask(t *testing.T) {
 			Delete("TEST-ID").
 			Return(nil)
 
-		err := service.DeleteTask("TEST-ID")
+		err := service.Delete("TEST-ID")
 
 		assert.NoError(t, err)
 	})
@@ -275,7 +275,7 @@ func TestDeleteTask(t *testing.T) {
 
 		// No expectations on mockRepo as it should not be called
 
-		err := service.DeleteTask("")
+		err := service.Delete("")
 
 		assert.Error(t, err)
 	})
@@ -292,103 +292,7 @@ func TestDeleteTask(t *testing.T) {
 			Delete("TEST-ID").
 			Return(repoErr)
 
-		err := service.DeleteTask("TEST-ID")
-
-		assert.Error(t, err)
-	})
-}
-
-func TestUpdateTaskStatus(t *testing.T) {
-	t.Run("should update task status", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
-		task := &Task{ID: "TEST-ID", Status: StatusNotStarted}
-
-		mockRepo.EXPECT().
-			FindByID("TEST-ID").
-			Return(task, nil)
-
-		mockRepo.EXPECT().
-			Update(match.PtrTo(&Task{
-				ID:     "TEST-ID",
-				Status: StatusCompleted,
-			})).
-			Return(nil)
-
-		err := service.UpdateTaskStatus("TEST-ID", StatusCompleted)
-
-		assert.NoError(t, err)
-		assert.Equal(t, StatusCompleted, task.Status)
-	})
-
-	t.Run("should call repository update after status change", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
-		task := &Task{
-			ID:     "TEST-ID",
-			Status: StatusNotStarted,
-		}
-
-		mockRepo.EXPECT().
-			FindByID("TEST-ID").
-			Return(task, nil)
-
-		mockRepo.EXPECT().
-			Update(match.PtrTo(&Task{
-				ID:     "TEST-ID",
-				Status: StatusInProgress,
-			})).
-			Return(nil)
-
-		err := service.UpdateTaskStatus("TEST-ID", StatusInProgress)
-
-		assert.NoError(t, err)
-		assert.Equal(t, StatusInProgress, task.Status)
-	})
-
-	t.Run("should return error when finding task fails", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
-		repoErr := errors.New("database error")
-
-		mockRepo.EXPECT().
-			FindByID("TEST-ID").
-			Return(nil, repoErr)
-
-		// No Update expectations as it should not be called
-
-		err := service.UpdateTaskStatus("TEST-ID", StatusCompleted)
-
-		assert.Error(t, err)
-	})
-
-	t.Run("should return error when update fails", func(t *testing.T) {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
-		task := &Task{ID: "TEST-ID", Status: StatusNotStarted}
-		repoErr := errors.New("database error")
-
-		mockRepo.EXPECT().
-			FindByID("TEST-ID").
-			Return(task, nil)
-
-		mockRepo.EXPECT().
-			Update(gomock.Any()).
-			Return(repoErr)
-
-		err := service.UpdateTaskStatus("TEST-ID", StatusCompleted)
+		err := service.Delete("TEST-ID")
 
 		assert.Error(t, err)
 	})
