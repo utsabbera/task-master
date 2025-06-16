@@ -4,7 +4,14 @@ import (
 	"log"
 
 	"github.com/utsabbera/task-master/api"
+	_ "github.com/utsabbera/task-master/docs/swagger" // swaggo generated docs
 )
+
+// @title Task Master API
+// @version 1.0
+// @description API for managing tasks
+// @host localhost:8080
+// @BasePath /
 
 func main() {
 	cfg := api.ServerConfig{

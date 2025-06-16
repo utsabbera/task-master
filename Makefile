@@ -1,4 +1,4 @@
-.PHONY: help build test clean lint fmt deps run env hooks mocks mock
+.PHONY: help build test clean lint fmt deps run env hooks mocks mock docs
 
 # Binary name
 BINARY_NAME=tasks
@@ -60,6 +60,10 @@ mocks:
 mock:
 	@echo "Generating mock for ${GOPACKAGE}/${GOFILE}..."
 
+# Generate Swagger docs
+docs:
+	swag init -g cmd/api/main.go -o docs/swagger
+
 # Help target
 help:
 	@echo "Available targets:"
@@ -73,3 +77,4 @@ help:
 	@echo "  env   - Reload direnv environment"
 	@echo "  hooks - Install git hooks with Lefthook"
 	@echo "  mocks - Generate mocks"
+	@echo "  docs  - Generate Swagger docs"

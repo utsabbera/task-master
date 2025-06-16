@@ -17,3 +17,5 @@ pre-push:
       run: go test ./... -race
     lint-all:
       run: golangci-lint run
+    docs:
+      run: make docs

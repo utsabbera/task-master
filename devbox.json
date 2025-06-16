@@ -4,7 +4,8 @@
     "golangci-lint@2.1.6",
     "lefthook@1.6.5",
     "gotestsum@1.11.0",
-    "mockgen@0.4.0"
+    "mockgen@0.4.0",
+    "go-swag@1.16.4"
   ],
   "shell": {
     "init_hook": [
