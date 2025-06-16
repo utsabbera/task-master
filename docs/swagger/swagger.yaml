@@ -2,21 +2,23 @@ basePath: /
 definitions:
   api.Task:
     properties:
-      completed:
-        type: boolean
       description:
         type: string
       id:
+        type: string
+      status:
         type: string
       title:
         type: string
     type: object
   api.TaskInput:
     properties:
-      completed:
-        type: boolean
       description:
         type: string
+      dueDate:
+        type: string
+      priority:
+        type: integer
       title:
         type: string
     type: object

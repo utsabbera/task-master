@@ -185,13 +185,13 @@ const docTemplate = `{
         "api.Task": {
             "type": "object",
             "properties": {
-                "completed": {
-                    "type": "boolean"
-                },
                 "description": {
                     "type": "string"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 },
                 "title": {
@@ -202,11 +202,14 @@ const docTemplate = `{
         "api.TaskInput": {
             "type": "object",
             "properties": {
-                "completed": {
-                    "type": "boolean"
-                },
                 "description": {
                     "type": "string"
+                },
+                "dueDate": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "integer"
                 },
                 "title": {
                     "type": "string"
