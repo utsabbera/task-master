@@ -1,7 +1,7 @@
-.PHONY: help build test clean lint fmt deps run env hooks
+.PHONY: help build test clean lint fmt deps run env hooks mocks mock
 
 # Binary name
-BINARY_NAME=task-master
+BINARY_NAME=tasks
 
 # Directories
 CMD_DIR=./cmd/cli
@@ -50,16 +50,15 @@ env:
 hooks:
 	@echo "Installing git hooks with Lefthook..."
 	lefthook install
-
-# Run hooks manually
-hooks:
-	@echo "Running git hooks manually..."
-	lefthook run pre-commit
 	
 # Generate mocks
-generate-mocks:
+mocks:
 	@echo "Generating mocks..."
-	go generate ./pkg/...
+	go generate ./...
+
+# Generate mock
+mock:
+	@echo "Generating mock for ${GOPACKAGE}/${GOFILE}..."
 
 # Help target
 help:
@@ -73,3 +72,4 @@ help:
 	@echo "  run   - Build and run the application"
 	@echo "  env   - Reload direnv environment"
 	@echo "  hooks - Install git hooks with Lefthook"
+	@echo "  mocks - Generate mocks"

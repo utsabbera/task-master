@@ -9,13 +9,13 @@ import (
 // It implements the Generator interface for generating predictable ID sequences
 type Sequential struct {
 	// prefix is the string that appears at the beginning of each generated ID
-	prefix   string
+	prefix string
 	// nextID is the numeric portion that will be used for the next ID
-	nextID   int
+	nextID int
 	// idFormat is the format string used to create IDs with consistent width
 	idFormat string
 	// mu protects concurrent access to the generator state
-	mu       sync.Mutex
+	mu sync.Mutex
 }
 
 // NewSequential creates a new sequential ID generator with the given prefix

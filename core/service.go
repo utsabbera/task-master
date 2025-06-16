@@ -1,4 +1,4 @@
-package task
+package core
 
 import (
 	"fmt"
@@ -25,12 +25,12 @@ func (s *Service) CreateTask(title, description string, priority Priority, dueDa
 	}
 
 	task := NewTask(title, description, priority, dueDate)
-	
+
 	err := s.repo.Create(task)
 	if err != nil {
 		return nil, fmt.Errorf("creating task: %w", err)
 	}
-	
+
 	return task, nil
 }
 
@@ -40,12 +40,12 @@ func (s *Service) GetTask(id string) (*Task, error) {
 	if id == "" {
 		return nil, fmt.Errorf("task ID cannot be empty")
 	}
-	
+
 	task, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, fmt.Errorf("finding task: %w", err)
 	}
-	
+
 	return task, nil
 }
 
@@ -55,7 +55,7 @@ func (s *Service) GetAllTasks() ([]*Task, error) {
 	if err != nil {
 		return nil, fmt.Errorf("retrieving tasks: %w", err)
 	}
-	
+
 	return tasks, nil
 }
 
@@ -70,7 +70,7 @@ func (s *Service) UpdateTask(task *Task) error {
 	if err != nil {
 		return fmt.Errorf("updating task: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -80,12 +80,12 @@ func (s *Service) DeleteTask(id string) error {
 	if id == "" {
 		return fmt.Errorf("task ID cannot be empty")
 	}
-	
+
 	err := s.repo.Delete(id)
 	if err != nil {
 		return fmt.Errorf("deleting task: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -96,13 +96,13 @@ func (s *Service) UpdateTaskStatus(id string, status Status) error {
 	if err != nil {
 		return fmt.Errorf("finding task: %w", err)
 	}
-	
+
 	task.Status = status
-	
+
 	err = s.repo.Update(task)
 	if err != nil {
 		return fmt.Errorf("updating task status: %w", err)
 	}
-	
+
 	return nil
 }

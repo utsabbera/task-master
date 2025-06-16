@@ -1,4 +1,4 @@
-package task
+package core
 
 import (
 	"time"
@@ -13,7 +13,7 @@ const (
 	// StatusInProgress indicates a task that is currently being worked on
 	StatusInProgress Status = "IN_PROGRESS"
 	// StatusCompleted indicates a task that has been finished
-	StatusCompleted  Status = "COMPLETED"
+	StatusCompleted Status = "COMPLETED"
 )
 
 // Priority defines the importance level of a task
@@ -21,31 +21,31 @@ type Priority int
 
 const (
 	// PriorityLow represents the lowest importance level
-	PriorityLow    Priority = 1
+	PriorityLow Priority = 1
 	// PriorityMedium represents the standard importance level
 	PriorityMedium Priority = 2
 	// PriorityHigh represents the highest importance level
-	PriorityHigh   Priority = 3
+	PriorityHigh Priority = 3
 )
 
 // Task represents a single task in the task management system
 type Task struct {
 	// ID is the unique identifier for the task
-	ID          string
+	ID string
 	// Title is the short name of the task
-	Title       string
+	Title string
 	// Description provides additional details about the task
 	Description string
 	// Status indicates the current state of the task
-	Status      Status
+	Status Status
 	// Priority indicates the importance level of the task
-	Priority    Priority
+	Priority Priority
 	// CreatedAt stores when the task was created
-	CreatedAt   time.Time
+	CreatedAt time.Time
 	// UpdatedAt stores when the task was last modified
-	UpdatedAt   time.Time
+	UpdatedAt time.Time
 	// DueDate is the optional deadline for the task
-	DueDate     *time.Time
+	DueDate *time.Time
 }
 
 // NewTask creates a new task with the specified properties

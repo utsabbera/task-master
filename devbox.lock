@@ -196,6 +196,54 @@
           "store_path": "/nix/store/4bhcya57cm93d42xwyvjmryn5w9s2949-lefthook-1.6.5"
         }
       }
+    },
+    "mockgen@0.4.0": {
+      "last_modified": "2024-10-13T23:44:06Z",
+      "resolved": "github:NixOS/nixpkgs/d4f247e89f6e10120f911e2e2d2254a050d0f732#mockgen",
+      "source": "devbox-search",
+      "version": "0.4.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/jsas3bh1z95xgdninxbh63a8vrrar3i6-mockgen-0.4.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/jsas3bh1z95xgdninxbh63a8vrrar3i6-mockgen-0.4.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/vp1vghr94f15rzx3hr0gbqh53hwk8612-mockgen-0.4.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/vp1vghr94f15rzx3hr0gbqh53hwk8612-mockgen-0.4.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ar36l493bsqfiqdcl282i1vj23ds7b4z-mockgen-0.4.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/ar36l493bsqfiqdcl282i1vj23ds7b4z-mockgen-0.4.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/8lc2nv4z53yh1dfr7w9f3i9zxybpdmxz-mockgen-0.4.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/8lc2nv4z53yh1dfr7w9f3i9zxybpdmxz-mockgen-0.4.0"
+        }
+      }
     }
   }
 }

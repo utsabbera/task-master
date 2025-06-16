@@ -1,4 +1,4 @@
-package task
+package core
 
 import (
 	"testing"
@@ -13,9 +13,9 @@ func TestNewTask(t *testing.T) {
 		description := "This is a test task"
 		priority := PriorityHigh
 		tomorrow := time.Now().Add(24 * time.Hour)
-		
+
 		task := NewTask(title, description, priority, &tomorrow)
-		
+
 		assert.Empty(t, task.ID, "ID should be empty")
 		assert.Equal(t, title, task.Title)
 		assert.Equal(t, description, task.Description)
@@ -25,16 +25,16 @@ func TestNewTask(t *testing.T) {
 		assert.Empty(t, task.CreatedAt)
 		assert.Empty(t, task.UpdatedAt)
 	})
-	
+
 	t.Run("should create task with nil due date", func(t *testing.T) {
 		task := NewTask("Test", "Description", PriorityMedium, nil)
-		
+
 		assert.Nil(t, task.DueDate)
 	})
-	
+
 	t.Run("should set status to not started", func(t *testing.T) {
 		task := NewTask("Test", "Description", PriorityLow, nil)
-		
+
 		assert.Equal(t, StatusNotStarted, task.Status)
 	})
 }

@@ -14,9 +14,15 @@ applyTo: "*.go,go.mod,go.sum"
 - Follow the standard Go project layout:
   - `/cmd` - Main applications
   - `/pkg` - Library code that's ok to use by external applications
-  - `/core` - Private application and library code
+  - `/core`- Private application and library code
   - `/api` - API definitions (protobuf, OpenAPI specs)
-  - `/scripts` - Scripts for build, setup, etc.
+  - `/bin` - Scripts for build, setup, etc.
+
+## Syntax and Language Features
+
+- Use Go generics (any, type parameters, constraints) to write reusable and type-safe functions.
+- Leverage new syntax improvements like simplified range loops and built-ins like clear, min, and max for cleaner code.
+- Csonider using standard utility packages like slices, maps, and cmp (from Go 1.21+) to simplify common operations.
 
 ## Error Handling
 

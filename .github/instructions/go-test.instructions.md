@@ -1,5 +1,5 @@
 ---
-applyTo: "_"
+applyTo: "_test.go"
 ---
 
 # Go Testing Guidelines

@@ -1,4 +1,4 @@
-package task
+package core
 
 import (
 	"errors"
@@ -12,8 +12,10 @@ var (
 	// ErrTaskNotFound is returned when a task with the specified ID cannot be found
 	ErrTaskNotFound = errors.New("task not found")
 	// ErrInvalidTask is returned when an operation is performed on an invalid task
-	ErrInvalidTask  = errors.New("invalid task")
+	ErrInvalidTask = errors.New("invalid task")
 )
+
+//go:generate mockgen -destination=repository_mock.go -package=core . Repository
 
 // Repository defines the interface for task data storage operations
 type Repository interface {
@@ -60,7 +62,7 @@ func (r *MemoryRepository) Create(t *Task) error {
 	if t.ID == "" {
 		t.ID = r.generator.Next()
 	}
-	
+
 	// Set timestamps
 	now := time.Now()
 	t.CreatedAt = now
