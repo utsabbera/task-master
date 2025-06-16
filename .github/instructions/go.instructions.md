@@ -15,7 +15,7 @@ applyTo: "*.go,go.mod,go.sum"
   - `/cmd` - Main applications
   - `/pkg` - Library code that's ok to use by external applications
   - `/core`- Private application and library code
-  - `/api` - API definitions (protobuf, OpenAPI specs)
+  - `/api` - API implementations (e.g. handlers, routes, etc.)
   - `/bin` - Scripts for build, setup, etc.
 
 ## Syntax and Language Features
