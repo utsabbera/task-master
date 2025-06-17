@@ -1,6 +1,6 @@
-# task-master
+# TaskMaster
 
-AI powered task manager
+**TaskMaster** is an AI-powered task manager designed to help you organize, prioritize, and track your tasks efficiently. Leveraging advanced AI, it intelligently categorizes tasks, suggests priorities, and streamlines your workflow, making productivity effortless for individuals and teams.
 
 ## Development
 
