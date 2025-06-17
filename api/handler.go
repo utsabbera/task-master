@@ -1,8 +1,42 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
+
+	"github.com/utsabbera/task-master/core"
 )
+
+//go:generate mockgen -destination=handler_mock.go -package=api . Handler
+
+// Handler defines the interface for handling HTTP requests related to tasks.
+type Handler interface {
+	// Create creates a new task.
+	Create(w http.ResponseWriter, r *http.Request)
+
+	// Get retrieves a task by its ID.
+	Get(w http.ResponseWriter, r *http.Request)
+
+	// List lists all tasks.
+	List(w http.ResponseWriter, r *http.Request)
+
+	// Update updates an existing task by its ID.
+	Update(w http.ResponseWriter, r *http.Request)
+
+	// Delete deletes a task by its ID.
+	Delete(w http.ResponseWriter, r *http.Request)
+}
+
+type handler struct {
+	service core.Service
+}
+
+// NewHandler returns a new instance of Handler for task operations.
+func NewHandler(service core.Service) Handler {
+	return &handler{
+		service: service,
+	}
+}
 
 // Create godoc
 // @Summary Create a new task
@@ -13,8 +47,34 @@ import (
 // @Param task body TaskInput true "Task input"
 // @Success 201 {object} Task
 // @Router /tasks [post]
-func (h *taskHandler) Create(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "not implemented", http.StatusNotImplemented)
+func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
+	var input TaskInput
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&input); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+	err := r.Body.Close()
+	if err != nil {
+		http.Error(w, "Failed to close request body", http.StatusInternalServerError)
+		return
+	}
+
+	task, err := h.service.Create(input.Title, input.Description, input.Priority, input.DueDate)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+
+	response := mapTaskToResponse(task)
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
 
 // Get godoc
@@ -26,8 +86,27 @@ func (h *taskHandler) Create(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} Task
 // @Failure 404 {string} string "Task not found"
 // @Router /tasks/{id} [get]
-func (h *taskHandler) Get(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "not implemented", http.StatusNotImplemented)
+func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id") // TODO: Declare a constant for the id
+	if id == "" {
+		http.Error(w, "Missing task ID", http.StatusBadRequest)
+		return
+	}
+
+	task, err := h.service.Get(id)
+	if err != nil {
+		http.Error(w, "Task not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	response := mapTaskToResponse(task)
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
 
 // List godoc
@@ -37,8 +116,21 @@ func (h *taskHandler) Get(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Success 200 {array} Task
 // @Router /tasks [get]
-func (h *taskHandler) List(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "not implemented", http.StatusNotImplemented)
+func (h *handler) List(w http.ResponseWriter, r *http.Request) {
+	tasks, err := h.service.List()
+	if err != nil {
+		http.Error(w, "Failed to retrieve tasks", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	response := mapTasksToResponse(tasks)
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
 
 // Update godoc
@@ -52,8 +144,49 @@ func (h *taskHandler) List(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} Task
 // @Failure 404 {string} string "Task not found"
 // @Router /tasks/{id} [put]
-func (h *taskHandler) Update(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "not implemented", http.StatusNotImplemented)
+func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	if id == "" {
+		http.Error(w, "Missing task ID", http.StatusBadRequest)
+		return
+	}
+
+	var input TaskInput
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&input); err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
+	err := r.Body.Close()
+	if err != nil {
+		http.Error(w, "Failed to close request body", http.StatusInternalServerError)
+		return
+	}
+
+	task, err := h.service.Get(id)
+	if err != nil {
+		http.Error(w, "Task not found", http.StatusNotFound)
+		return
+	}
+
+	task.Title = input.Title
+	task.Description = input.Description
+	task.Priority = input.Priority
+	task.DueDate = input.DueDate
+
+	if err := h.service.Update(task); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	response := mapTaskToResponse(task)
+
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
 
 // Delete godoc
@@ -64,23 +197,17 @@ func (h *taskHandler) Update(w http.ResponseWriter, r *http.Request) {
 // @Success 204 {string} string "Task deleted"
 // @Failure 404 {string} string "Task not found"
 // @Router /tasks/{id} [delete]
-func (h *taskHandler) Delete(w http.ResponseWriter, r *http.Request) {
-	http.Error(w, "not implemented", http.StatusNotImplemented)
-}
+func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	if id == "" {
+		http.Error(w, "Missing task ID", http.StatusBadRequest)
+		return
+	}
 
-// Handler defines the interface for handling HTTP requests related to tasks.
-type Handler interface {
-	Create(w http.ResponseWriter, r *http.Request)
-	Get(w http.ResponseWriter, r *http.Request)
-	List(w http.ResponseWriter, r *http.Request)
-	Update(w http.ResponseWriter, r *http.Request)
-	Delete(w http.ResponseWriter, r *http.Request)
-}
+	if err := h.service.Delete(id); err != nil {
+		http.Error(w, "Task not found", http.StatusNotFound)
+		return
+	}
 
-type taskHandler struct {
-}
-
-// NewHandler returns a new instance of Handler for task operations.
-func NewHandler() Handler {
-	return &taskHandler{}
+	w.WriteHeader(http.StatusNoContent)
 }

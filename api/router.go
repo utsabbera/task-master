@@ -7,13 +7,14 @@ import (
 	"github.com/utsabbera/task-master/pkg/middleware"
 )
 
-func newTaskRouter(handler Handler, middlewares ...middleware.Middleware) http.Handler {
+// NewTaskRouter creates a new HTTP router for task-related endpoints.
+func NewTaskRouter(handler Handler, middlewares ...middleware.Middleware) http.Handler {
 	router := http.NewServeMux()
-	router.HandleFunc("POST /", handler.Create)
-	router.HandleFunc("GET /", handler.List)
-	router.HandleFunc("GET /{id}", handler.Get)
-	router.HandleFunc("PUT /{id}", handler.Update)
-	router.HandleFunc("DELETE /{id}", handler.Delete)
+	router.HandleFunc("POST /tasks/", handler.Create)
+	router.HandleFunc("GET /tasks/", handler.List)
+	router.HandleFunc("GET /tasks/{id}", handler.Get)
+	router.HandleFunc("PUT /tasks/{id}", handler.Update)
+	router.HandleFunc("DELETE /tasks/{id}", handler.Delete)
 
 	return middleware.Bind(router, middlewares...)
 }
@@ -22,7 +23,7 @@ func newTaskRouter(handler Handler, middlewares ...middleware.Middleware) http.H
 func NewRouter(handler Handler, middlewares ...middleware.Middleware) http.Handler {
 
 	router := http.NewServeMux()
-	router.Handle("/tasks/", newTaskRouter(handler, middlewares...))
+	router.Handle("/", NewTaskRouter(handler, middlewares...))
 	router.Handle("/swagger/", swagger.WrapHandler)
 
 	return router

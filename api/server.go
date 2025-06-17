@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 
+	"github.com/utsabbera/task-master/core"
 	"github.com/utsabbera/task-master/pkg/middleware"
 )
 
@@ -18,7 +19,9 @@ func NewServer(cfg ServerConfig) *http.Server {
 		addr = ":8080"
 	}
 
-	handler := NewHandler()
+	repo := core.NewDefaultMemoryRepository()
+	service := core.NewService(repo)
+	handler := NewHandler(service)
 
 	middlewares := []middleware.Middleware{
 		middleware.Log(),

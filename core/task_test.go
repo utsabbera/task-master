@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/utsabbera/task-master/pkg/util"
 )
 
 func TestNewTask(t *testing.T) {
@@ -14,26 +15,32 @@ func TestNewTask(t *testing.T) {
 		priority := PriorityHigh
 		tomorrow := time.Now().Add(24 * time.Hour)
 
-		task := NewTask(title, description, priority, &tomorrow)
+		task := NewTask(title, description, &priority, &tomorrow)
 
 		assert.Empty(t, task.ID, "ID should be empty")
 		assert.Equal(t, title, task.Title)
 		assert.Equal(t, description, task.Description)
-		assert.Equal(t, priority, task.Priority)
 		assert.Equal(t, StatusNotStarted, task.Status)
+		assert.Equal(t, priority, *task.Priority)
 		assert.Equal(t, tomorrow, *task.DueDate)
 		assert.Empty(t, task.CreatedAt)
 		assert.Empty(t, task.UpdatedAt)
 	})
 
 	t.Run("should create task with nil due date", func(t *testing.T) {
-		task := NewTask("Test", "Description", PriorityMedium, nil)
+		task := NewTask("Test", "Description", util.Ptr(PriorityMedium), nil)
 
 		assert.Nil(t, task.DueDate)
 	})
 
+	t.Run("should create task with nil priority", func(t *testing.T) {
+		task := NewTask("Test", "Description", nil, nil)
+
+		assert.Nil(t, task.Priority)
+	})
+
 	t.Run("should set status to not started", func(t *testing.T) {
-		task := NewTask("Test", "Description", PriorityLow, nil)
+		task := NewTask("Test", "Description", nil, nil)
 
 		assert.Equal(t, StatusNotStarted, task.Status)
 	})

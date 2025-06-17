@@ -3,6 +3,7 @@ package core
 import (
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/utsabbera/task-master/pkg/match"
@@ -17,24 +18,82 @@ func TestService_Create(t *testing.T) {
 		mockRepo := NewMockRepository(ctrl)
 		service := NewService(mockRepo)
 
+		priority := PriorityMedium
+		due := time.Now().Add(24 * time.Hour).Truncate(time.Second)
+
 		mockRepo.EXPECT().
 			Create(match.PtrTo(&Task{
 				Title:       "Test Task",
 				Description: "Description",
 				Status:      StatusNotStarted,
-				Priority:    PriorityMedium,
+				Priority:    &priority,
+				DueDate:     &due,
 			})).
 			DoAndReturn(func(task *Task) error {
 				task.ID = "TEST-ID"
 				return nil
 			})
 
-		task, err := service.Create("Test Task", "Description", PriorityMedium, nil)
+		task, err := service.Create("Test Task", "Description", &priority, &due)
 
 		assert.NoError(t, err)
 		assert.Equal(t, "TEST-ID", task.ID)
 		assert.Equal(t, "Test Task", task.Title)
 		assert.Equal(t, "Description", task.Description)
+		assert.Equal(t, &priority, task.Priority)
+		assert.WithinDuration(t, due, *task.DueDate, time.Second)
+	})
+
+	t.Run("should create task without priority", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockRepo := NewMockRepository(ctrl)
+		service := NewService(mockRepo)
+		due := time.Now().Add(24 * time.Hour).Truncate(time.Second)
+
+		mockRepo.EXPECT().
+			Create(match.PtrTo(&Task{
+				Title:       "No Priority",
+				Description: "Description",
+				Status:      StatusNotStarted,
+				Priority:    nil,
+				DueDate:     &due,
+			})).
+			Return(nil)
+
+		task, err := service.Create("No Priority", "Description", nil, &due)
+
+		assert.NoError(t, err)
+		assert.Equal(t, "No Priority", task.Title)
+		assert.Nil(t, task.Priority)
+		assert.WithinDuration(t, due, *task.DueDate, time.Second)
+	})
+
+	t.Run("should create task without due date", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockRepo := NewMockRepository(ctrl)
+		service := NewService(mockRepo)
+		priority := PriorityHigh
+
+		mockRepo.EXPECT().
+			Create(match.PtrTo(&Task{
+				Title:       "No DueDate",
+				Description: "Description",
+				Status:      StatusNotStarted,
+				Priority:    &priority,
+				DueDate:     nil,
+			})).
+			Return(nil)
+
+		task, err := service.Create("No DueDate", "Description", &priority, nil)
+
+		assert.NoError(t, err)
+		assert.Equal(t, "No DueDate", task.Title)
+		assert.Equal(t, &priority, task.Priority)
+		assert.Nil(t, task.DueDate)
 	})
 
 	t.Run("should return error with empty title", func(t *testing.T) {
@@ -46,7 +105,7 @@ func TestService_Create(t *testing.T) {
 
 		// No expectations on mockRepo as it should not be called
 
-		task, err := service.Create("", "Description", PriorityMedium, nil)
+		task, err := service.Create("", "Description", nil, nil)
 
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "empty")
@@ -66,11 +125,10 @@ func TestService_Create(t *testing.T) {
 				Title:       "Test Task",
 				Description: "Description",
 				Status:      StatusNotStarted,
-				Priority:    PriorityMedium,
 			})).
 			Return(repoErr)
 
-		task, err := service.Create("Test Task", "Description", PriorityMedium, nil)
+		task, err := service.Create("Test Task", "Description", nil, nil)
 
 		assert.Error(t, err)
 		assert.Nil(t, task)

@@ -20,7 +20,9 @@ func TestMemoryRepository_Create(t *testing.T) {
 		mockGen.EXPECT().Next().Return("A").Times(1)
 
 		repo := NewMemoryRepository(mockGen)
-		task := NewTask("Test Task", "Description", PriorityMedium, nil)
+		priority := PriorityMedium
+		due := time.Now().Add(24 * time.Hour).Truncate(time.Second)
+		task := NewTask("Test Task", "Description", &priority, &due)
 
 		assert.Empty(t, task.CreatedAt)
 		assert.Empty(t, task.UpdatedAt)
@@ -47,7 +49,7 @@ func TestMemoryRepository_Create(t *testing.T) {
 		// Next() should not be called when ID is already set
 
 		repo := NewMemoryRepository(mockGen)
-		task := NewTask("Test Task", "Description", PriorityMedium, nil)
+		task := NewTask("Test Task", "Description", nil, nil)
 		task.ID = "CUSTOM-ID"
 
 		assert.Empty(t, task.CreatedAt)
@@ -65,6 +67,45 @@ func TestMemoryRepository_Create(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, task, storedTask)
 	})
+	t.Run("should create task without priority", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockGen := mock_idgen.NewMockGenerator(ctrl)
+		mockGen.EXPECT().Next().Return("B").Times(1)
+
+		repo := NewMemoryRepository(mockGen)
+		due := time.Now().Add(24 * time.Hour).Truncate(time.Second)
+		task := NewTask("No Priority", "desc", nil, &due)
+
+		err := repo.Create(task)
+		require.NoError(t, err)
+		assert.Equal(t, "B", task.ID)
+		storedTask, err := repo.Get("B")
+
+		require.NoError(t, err)
+		assert.Nil(t, storedTask.Priority)
+	})
+
+	t.Run("should create task without dueDate", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockGen := mock_idgen.NewMockGenerator(ctrl)
+		mockGen.EXPECT().Next().Return("C").Times(1)
+
+		repo := NewMemoryRepository(mockGen)
+		priority := PriorityMedium
+		task := NewTask("No DueDate", "desc", &priority, nil)
+
+		err := repo.Create(task)
+		require.NoError(t, err)
+		assert.Equal(t, "C", task.ID)
+
+		storedTask, err := repo.Get("C")
+		require.NoError(t, err)
+		assert.Nil(t, storedTask.DueDate)
+	})
 }
 
 func TestMemoryRepository_Get(t *testing.T) {
@@ -76,7 +117,7 @@ func TestMemoryRepository_Get(t *testing.T) {
 		mockGen.EXPECT().Next().Return("A").Times(1)
 
 		repo := NewMemoryRepository(mockGen)
-		task := NewTask("Test Task", "Description", PriorityMedium, nil)
+		task := NewTask("Test Task", "Description", nil, nil)
 		require.NoError(t, repo.Create(task))
 
 		result, err := repo.Get(task.ID)
@@ -111,8 +152,8 @@ func TestMemoryRepository_List(t *testing.T) {
 		mockGen.EXPECT().Next().Return("B").Times(1)
 
 		repo := NewMemoryRepository(mockGen)
-		task1 := NewTask("Task 1", "Description 1", PriorityLow, nil)
-		task2 := NewTask("Task 2", "Description 2", PriorityHigh, nil)
+		task1 := NewTask("Task 1", "Description 1", nil, nil)
+		task2 := NewTask("Task 2", "Description 2", nil, nil)
 
 		require.NoError(t, repo.Create(task1))
 		require.NoError(t, repo.Create(task2))
@@ -160,7 +201,7 @@ func TestMemoryRepository_Update(t *testing.T) {
 		mockGen.EXPECT().Next().Return("A").Times(1)
 
 		repo := NewMemoryRepository(mockGen)
-		task := NewTask("Original Title", "Description", PriorityMedium, nil)
+		task := NewTask("Original Title", "Description", nil, nil)
 		require.NoError(t, repo.Create(task))
 
 		originalCreatedAt := task.CreatedAt
@@ -191,7 +232,7 @@ func TestMemoryRepository_Update(t *testing.T) {
 		mockGen := mock_idgen.NewMockGenerator(ctrl)
 
 		repo := NewMemoryRepository(mockGen)
-		task := NewTask("Original Title", "Description", PriorityMedium, nil)
+		task := NewTask("Original Title", "Description", nil, nil)
 		task.ID = "non-existent"
 
 		err := repo.Update(task)
@@ -210,7 +251,7 @@ func TestMemoryRepository_Delete(t *testing.T) {
 		mockGen.EXPECT().Next().Return("A").Times(1)
 
 		repo := NewMemoryRepository(mockGen)
-		task := NewTask("Test Task", "Description", PriorityMedium, nil)
+		task := NewTask("Test Task", "Description", nil, nil)
 		require.NoError(t, repo.Create(task))
 		taskID := task.ID
 
@@ -242,7 +283,7 @@ func TestNewDefaultMemoryRepository(t *testing.T) {
 		repo := NewDefaultMemoryRepository()
 		require.NotNil(t, repo)
 
-		task := NewTask("Test Task", "Description", PriorityMedium, nil)
+		task := NewTask("Test Task", "Description", nil, nil)
 		require.NoError(t, repo.Create(task))
 		assert.Equal(t, "TASK-000001", task.ID)
 	})

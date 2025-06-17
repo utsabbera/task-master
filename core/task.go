@@ -39,7 +39,7 @@ type Task struct {
 	// Status indicates the current state of the task
 	Status Status
 	// Priority indicates the importance level of the task
-	Priority Priority
+	Priority *Priority
 	// CreatedAt stores when the task was created
 	CreatedAt time.Time
 	// UpdatedAt stores when the task was last modified
@@ -50,7 +50,7 @@ type Task struct {
 
 // NewTask creates a new task with the specified properties
 // The ID field and timestamps will be managed by the repository
-func NewTask(title, description string, priority Priority, dueDate *time.Time) *Task {
+func NewTask(title, description string, priority *Priority, dueDate *time.Time) *Task {
 	return &Task{
 		Title:       title,
 		Description: description,

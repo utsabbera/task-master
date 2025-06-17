@@ -10,7 +10,7 @@ import (
 // Service defines the interface for task management operations
 type Service interface {
 	// Create adds a new task with the specified title, description, priority, and optional due date
-	Create(title, description string, priority Priority, dueDate *time.Time) (*Task, error)
+	Create(title, description string, priority *Priority, dueDate *time.Time) (*Task, error)
 
 	// Get retrieves a task by its ID
 	Get(id string) (*Task, error)
@@ -38,7 +38,7 @@ func NewService(repo Repository) Service {
 
 // Create creates a new task with the provided details
 // Returns an error if the title is empty or if there's an issue with the repository
-func (s *service) Create(title, description string, priority Priority, dueDate *time.Time) (*Task, error) {
+func (s *service) Create(title, description string, priority *Priority, dueDate *time.Time) (*Task, error) {
 	if title == "" {
 		return nil, fmt.Errorf("title cannot be empty")
 	}

@@ -185,16 +185,28 @@ const docTemplate = `{
         "api.Task": {
             "type": "object",
             "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
                 "description": {
+                    "type": "string"
+                },
+                "dueDate": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
+                "priority": {
+                    "$ref": "#/definitions/core.Priority"
+                },
                 "status": {
-                    "type": "string"
+                    "$ref": "#/definitions/core.Status"
                 },
                 "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
                     "type": "string"
                 }
             }
@@ -209,12 +221,38 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "priority": {
-                    "type": "integer"
+                    "$ref": "#/definitions/core.Priority"
                 },
                 "title": {
                     "type": "string"
                 }
             }
+        },
+        "core.Priority": {
+            "type": "integer",
+            "enum": [
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "PriorityLow",
+                "PriorityMedium",
+                "PriorityHigh"
+            ]
+        },
+        "core.Status": {
+            "type": "string",
+            "enum": [
+                "NOT_STARTED",
+                "IN_PROGRESS",
+                "COMPLETED"
+            ],
+            "x-enum-varnames": [
+                "StatusNotStarted",
+                "StatusInProgress",
+                "StatusCompleted"
+            ]
         }
     }
 }`
