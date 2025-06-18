@@ -4,7 +4,7 @@
 BINARY_NAME=tasks
 
 # Directories
-CMD_DIR=./cmd/cli
+CMD_DIR=./cmd/api
 BIN_DIR=./bin
 
 # Default target

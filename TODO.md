@@ -1,6 +1,6 @@
 ## Fix:
 
-- [ ] Fix `make run`
+- [x] Fix `make run`
 
 ## Features:
 

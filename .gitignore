@@ -41,3 +41,6 @@ go.work.sum
 # Lefthook
 .lefthook-local/
 lefthook-local.json
+
+# Binary files
+bin/
