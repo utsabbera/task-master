@@ -11,7 +11,7 @@ import (
 )
 
 func TestRouter(t *testing.T) {
-	t.Run("POST /tasks/", func(t *testing.T) {
+	t.Run("POST /tasks", func(t *testing.T) {
 		mockCtrl := gomock.NewController(t)
 		defer mockCtrl.Finish()
 
@@ -19,7 +19,7 @@ func TestRouter(t *testing.T) {
 		router := NewRouter(handler)
 		rw := httptest.NewRecorder()
 
-		req, err := http.NewRequest(http.MethodPost, "/tasks/", nil)
+		req, err := http.NewRequest(http.MethodPost, "/tasks", nil)
 		require.NoError(t, err)
 
 		handler.EXPECT().Create(rw, req)
@@ -28,7 +28,7 @@ func TestRouter(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rw.Code)
 	})
 
-	t.Run("GET /tasks/", func(t *testing.T) {
+	t.Run("GET /tasks", func(t *testing.T) {
 		mockCtrl := gomock.NewController(t)
 		defer mockCtrl.Finish()
 
@@ -36,7 +36,7 @@ func TestRouter(t *testing.T) {
 		router := NewRouter(handler)
 		rw := httptest.NewRecorder()
 
-		req, err := http.NewRequest(http.MethodGet, "/tasks/", nil)
+		req, err := http.NewRequest(http.MethodGet, "/tasks", nil)
 		require.NoError(t, err)
 
 		handler.EXPECT().List(rw, req)

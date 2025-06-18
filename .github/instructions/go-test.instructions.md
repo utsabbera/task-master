@@ -7,6 +7,7 @@ applyTo: "_test.go"
 ## Best Practices
 
 - Keep tests small and focused
+- Use testify/assert for assertions and testify/require for test requirements
 - Use descriptive test names (start with should)
 - Avoid testing private functions directly
 - Aim for high test coverage, especially for critical paths

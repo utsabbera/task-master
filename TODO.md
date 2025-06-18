@@ -1,3 +1,7 @@
+## Fix:
+
+- [ ] Fix `make run`
+
 ## Features:
 
 - [ ] Add feature to create new task in any status
