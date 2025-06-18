@@ -24,7 +24,7 @@ const docTemplate = `{
                 "tags": [
                     "tasks"
                 ],
-                "summary": "List all tasks",
+                "summary": "List Tasks",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -48,7 +48,7 @@ const docTemplate = `{
                 "tags": [
                     "tasks"
                 ],
-                "summary": "Create a new task",
+                "summary": "Create Task",
                 "parameters": [
                     {
                         "description": "Task input",
@@ -79,7 +79,7 @@ const docTemplate = `{
                 "tags": [
                     "tasks"
                 ],
-                "summary": "Get a task by ID",
+                "summary": "Get Task",
                 "parameters": [
                     {
                         "type": "string",
@@ -115,7 +115,7 @@ const docTemplate = `{
                 "tags": [
                     "tasks"
                 ],
-                "summary": "Update a task by ID",
+                "summary": "Update Task",
                 "parameters": [
                     {
                         "type": "string",
@@ -154,7 +154,7 @@ const docTemplate = `{
                 "tags": [
                     "tasks"
                 ],
-                "summary": "Delete a task by ID",
+                "summary": "Delete Task",
                 "parameters": [
                     {
                         "type": "string",
@@ -263,7 +263,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "Task Master API",
+	Title:            "Task Master",
 	Description:      "API for managing tasks",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

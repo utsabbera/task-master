@@ -7,7 +7,7 @@ import (
 	_ "github.com/utsabbera/task-master/docs/swagger" // swaggo generated docs
 )
 
-// @title Task Master API
+// @title Task Master
 // @version 1.0
 // @description API for managing tasks
 // @host localhost:8080

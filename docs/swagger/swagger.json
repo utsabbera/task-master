@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "description": "API for managing tasks",
-        "title": "Task Master API",
+        "title": "Task Master",
         "contact": {},
         "version": "1.0"
     },
@@ -18,7 +18,7 @@
                 "tags": [
                     "tasks"
                 ],
-                "summary": "List all tasks",
+                "summary": "List Tasks",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -42,7 +42,7 @@
                 "tags": [
                     "tasks"
                 ],
-                "summary": "Create a new task",
+                "summary": "Create Task",
                 "parameters": [
                     {
                         "description": "Task input",
@@ -73,7 +73,7 @@
                 "tags": [
                     "tasks"
                 ],
-                "summary": "Get a task by ID",
+                "summary": "Get Task",
                 "parameters": [
                     {
                         "type": "string",
@@ -109,7 +109,7 @@
                 "tags": [
                     "tasks"
                 ],
-                "summary": "Update a task by ID",
+                "summary": "Update Task",
                 "parameters": [
                     {
                         "type": "string",
@@ -148,7 +148,7 @@
                 "tags": [
                     "tasks"
                 ],
-                "summary": "Delete a task by ID",
+                "summary": "Delete Task",
                 "parameters": [
                     {
                         "type": "string",

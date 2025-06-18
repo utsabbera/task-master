@@ -39,7 +39,7 @@ func NewHandler(service core.Service) Handler {
 }
 
 // Create godoc
-// @Summary Create a new task
+// @Summary Create Task
 // @Description Create a new task
 // @Tags tasks
 // @Accept json
@@ -78,7 +78,7 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 // Get godoc
-// @Summary Get a task by ID
+// @Summary Get Task
 // @Description Get a task by ID
 // @Tags tasks
 // @Produce json
@@ -110,7 +110,7 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 // List godoc
-// @Summary List all tasks
+// @Summary List Tasks
 // @Description List all tasks
 // @Tags tasks
 // @Produce json
@@ -134,7 +134,7 @@ func (h *handler) List(w http.ResponseWriter, r *http.Request) {
 }
 
 // Update godoc
-// @Summary Update a task by ID
+// @Summary Update Task
 // @Description Update a task by ID
 // @Tags tasks
 // @Accept json
@@ -190,7 +190,7 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 // Delete godoc
-// @Summary Delete a task by ID
+// @Summary Delete Task
 // @Description Delete a task by ID
 // @Tags tasks
 // @Param id path string true "Task ID"

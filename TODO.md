@@ -12,7 +12,9 @@
 
 ## Improvements:
 
-- [ ] Use enummer for better enum management and parsing
 - [ ] Add api tests to test e2e
+- [ ] Integrate better logging mechanism
+- [ ] Use enummer for better enum management and parsing
 - [ ] Configure golangci-lint for better linting
 - [ ] Restructure hooks - optimise duplicate runners for push and commit
+- [ ] Enhance swagger and bruno docs
