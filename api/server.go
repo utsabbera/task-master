@@ -20,8 +20,8 @@ func NewServer(cfg ServerConfig) *http.Server {
 	}
 
 	repo := core.NewDefaultMemoryRepository()
-	service := core.NewService(repo)
-	handler := NewHandler(service)
+	taskService := core.NewTaskService(repo)
+	handler := NewHandler(taskService)
 
 	middlewares := []middleware.Middleware{
 		middleware.Log(),

@@ -28,13 +28,13 @@ type Handler interface {
 }
 
 type handler struct {
-	service core.Service
+	taskService core.TaskService
 }
 
 // NewHandler returns a new instance of Handler for task operations.
-func NewHandler(service core.Service) Handler {
+func NewHandler(taskService core.TaskService) Handler {
 	return &handler{
-		service: service,
+		taskService: taskService,
 	}
 }
 
@@ -60,7 +60,7 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := h.service.Create(input.Title, input.Description, input.Priority, input.DueDate)
+	task, err := h.taskService.Create(input.Title, input.Description, input.Priority, input.DueDate)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -93,7 +93,7 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := h.service.Get(id)
+	task, err := h.taskService.Get(id)
 	if err != nil {
 		http.Error(w, "Task not found", http.StatusNotFound)
 		return
@@ -117,7 +117,7 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} Task
 // @Router /tasks [get]
 func (h *handler) List(w http.ResponseWriter, r *http.Request) {
-	tasks, err := h.service.List()
+	tasks, err := h.taskService.List()
 	if err != nil {
 		http.Error(w, "Failed to retrieve tasks", http.StatusInternalServerError)
 		return
@@ -163,7 +163,7 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := h.service.Get(id)
+	task, err := h.taskService.Get(id)
 	if err != nil {
 		http.Error(w, "Task not found", http.StatusNotFound)
 		return
@@ -174,7 +174,7 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 	task.Priority = input.Priority
 	task.DueDate = input.DueDate
 
-	if err := h.service.Update(task); err != nil {
+	if err := h.taskService.Update(task); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -204,7 +204,7 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.service.Delete(id); err != nil {
+	if err := h.taskService.Delete(id); err != nil {
 		http.Error(w, "Task not found", http.StatusNotFound)
 		return
 	}

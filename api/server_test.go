@@ -36,7 +36,8 @@ func TestNewServer(t *testing.T) {
 func TestIntegration_Server(t *testing.T) {
 	t.Run("should create task with title and description", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
-		handler := NewHandler(core.NewService(repo))
+		service := core.NewTaskService(repo)
+		handler := NewHandler(service)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -68,7 +69,8 @@ func TestIntegration_Server(t *testing.T) {
 
 	t.Run("should create task with due date", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
-		handler := NewHandler(core.NewService(repo))
+		service := core.NewTaskService(repo)
+		handler := NewHandler(service)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -102,7 +104,8 @@ func TestIntegration_Server(t *testing.T) {
 
 	t.Run("should create task with priority", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
-		handler := NewHandler(core.NewService(repo))
+		service := core.NewTaskService(repo)
+		handler := NewHandler(service)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -136,7 +139,8 @@ func TestIntegration_Server(t *testing.T) {
 
 	t.Run("should get created task with Id", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
-		handler := NewHandler(core.NewService(repo))
+		service := core.NewTaskService(repo)
+		handler := NewHandler(service)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -181,7 +185,8 @@ func TestIntegration_Server(t *testing.T) {
 
 	t.Run("should get list of created tasks", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
-		handler := NewHandler(core.NewService(repo))
+		service := core.NewTaskService(repo)
+		handler := NewHandler(service)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -232,7 +237,8 @@ func TestIntegration_Server(t *testing.T) {
 
 	t.Run("should update created task", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
-		handler := NewHandler(core.NewService(repo))
+		taskService := core.NewTaskService(repo)
+		handler := NewHandler(taskService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -290,7 +296,8 @@ func TestIntegration_Server(t *testing.T) {
 
 	t.Run("should delete created task", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
-		handler := NewHandler(core.NewService(repo))
+		service := core.NewTaskService(repo)
+		handler := NewHandler(service)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)

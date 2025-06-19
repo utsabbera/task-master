@@ -23,7 +23,7 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		input := TaskInput{
@@ -81,7 +81,7 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		// Act
@@ -101,7 +101,7 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		input := TaskInput{
@@ -141,7 +141,7 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		taskID := "task-123"
@@ -185,7 +185,7 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		// Act
@@ -204,7 +204,7 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		taskID := "non-existent"
@@ -233,7 +233,7 @@ func TestHandler_List(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		tasks := []*core.Task{
@@ -290,7 +290,7 @@ func TestHandler_List(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		mockService.EXPECT().
@@ -315,7 +315,7 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		taskID := "task-123"
@@ -380,7 +380,7 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		input := TaskInput{
@@ -408,7 +408,7 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		taskID := "task-123"
@@ -431,7 +431,7 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		taskID := "non-existent"
@@ -465,7 +465,7 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		taskID := "task-123"
@@ -510,7 +510,7 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		taskID := "task-123"
@@ -537,7 +537,7 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		// Act
@@ -556,7 +556,7 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockService(ctrl)
+		mockService := core.NewMockTaskService(ctrl)
 		handler := NewHandler(mockService)
 
 		taskID := "non-existent"
