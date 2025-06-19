@@ -42,5 +42,5 @@ go.work.sum
 .lefthook-local/
 lefthook-local.json
 
-# Binary files
-bin/
+# Output files
+out/

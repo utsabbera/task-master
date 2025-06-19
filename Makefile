@@ -1,11 +1,11 @@
-.PHONY: help build test clean lint fmt deps run env hooks mocks mock docs
+.PHONY: help build test coverage clean lint fmt deps run env hooks mocks mock docs
 
 # Binary name
 BINARY_NAME=tasks
 
 # Directories
 CMD_DIR=./cmd/api
-BIN_DIR=./bin
+BIN_DIR=./out
 
 # Default target
 all: build
@@ -17,7 +17,13 @@ build:
 
 # Run tests with standard output
 test:
-	gotestsum -- ./...
+	gotestsum --format pkgname -- ./...
+
+# Generate test coverage report
+coverage:
+	mkdir -p ./out
+	gotestsum --format pkgname -- -coverprofile=./out/coverage.out ./...
+	go tool cover -html=./out/coverage.out -o ./out/coverage.html
 
 # Run linter
 lint:
@@ -78,3 +84,4 @@ help:
 	@echo "  hooks - Install git hooks with Lefthook"
 	@echo "  mocks - Generate mocks"
 	@echo "  docs  - Generate Swagger docs"
+	@echo "  coverage - Generate test coverage report"
