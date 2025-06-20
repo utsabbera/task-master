@@ -21,7 +21,8 @@ func NewServer(cfg ServerConfig) *http.Server {
 
 	repo := core.NewDefaultMemoryRepository()
 	taskService := core.NewTaskService(repo)
-	handler := NewHandler(taskService)
+	promptService := core.NewPromptService(taskService)
+	handler := NewHandler(taskService, promptService)
 
 	middlewares := []middleware.Middleware{
 		middleware.Log(),

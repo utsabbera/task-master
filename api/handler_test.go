@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -23,8 +24,9 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		input := TaskInput{
 			Title:       "Test Task",
@@ -35,7 +37,7 @@ func TestHandler_Create(t *testing.T) {
 
 		inputBytes, err := json.Marshal(input)
 		require.NoError(t, err)
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			Create(
 				input.Title,
 				input.Description,
@@ -81,8 +83,9 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		// Act
 		req := httptest.NewRequest(http.MethodPost, "/tasks", bytes.NewReader([]byte("invalid json")))
@@ -101,8 +104,9 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		input := TaskInput{
 			Title:       "Test Task",
@@ -113,7 +117,7 @@ func TestHandler_Create(t *testing.T) {
 		inputBytes, err := json.Marshal(input)
 		require.NoError(t, err)
 
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			Create(
 				input.Title,
 				input.Description,
@@ -141,8 +145,9 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "task-123"
 		task := &core.Task{
@@ -152,7 +157,7 @@ func TestHandler_Get(t *testing.T) {
 			Status:      core.StatusNotStarted,
 		}
 
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			Get(taskID).
 			Return(task, nil)
 
@@ -185,8 +190,9 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		// Act
 		req := httptest.NewRequest(http.MethodGet, "/tasks/", nil)
@@ -204,12 +210,13 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "non-existent"
 
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			Get(taskID).
 			Return(nil, core.ErrTaskNotFound)
 
@@ -233,8 +240,9 @@ func TestHandler_List(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		tasks := []*core.Task{
 			{
@@ -251,7 +259,7 @@ func TestHandler_List(t *testing.T) {
 			},
 		}
 
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			List().
 			Return(tasks, nil)
 
@@ -290,10 +298,11 @@ func TestHandler_List(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			List().
 			Return(nil, fmt.Errorf("database error"))
 
@@ -315,8 +324,9 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "task-123"
 		input := TaskInput{
@@ -329,7 +339,7 @@ func TestHandler_Update(t *testing.T) {
 		inputBytes, err := json.Marshal(input)
 		require.NoError(t, err)
 
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			Get(taskID).
 			Return(&core.Task{
 				ID:          taskID,
@@ -338,7 +348,7 @@ func TestHandler_Update(t *testing.T) {
 				Status:      core.StatusNotStarted,
 			}, nil)
 
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			Update(match.PtrTo(core.Task{
 				ID:          taskID,
 				Title:       input.Title,
@@ -380,8 +390,9 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		input := TaskInput{
 			Title:       "Updated Task",
@@ -408,8 +419,9 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "task-123"
 
@@ -431,8 +443,9 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "non-existent"
 		input := TaskInput{
@@ -443,7 +456,7 @@ func TestHandler_Update(t *testing.T) {
 		inputBytes, err := json.Marshal(input)
 		require.NoError(t, err)
 
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			Get(taskID).
 			Return(nil, core.ErrTaskNotFound)
 
@@ -465,8 +478,9 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "task-123"
 		input := TaskInput{
@@ -477,7 +491,7 @@ func TestHandler_Update(t *testing.T) {
 		inputBytes, err := json.Marshal(input)
 		require.NoError(t, err)
 
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			Get(taskID).
 			Return(&core.Task{
 				ID:          taskID,
@@ -486,7 +500,7 @@ func TestHandler_Update(t *testing.T) {
 				Status:      core.StatusNotStarted,
 			}, nil)
 
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			Update(gomock.Any()).
 			Return(fmt.Errorf("database error"))
 
@@ -510,12 +524,13 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "task-123"
 
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			Delete(taskID).
 			Return(nil)
 
@@ -537,8 +552,9 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		// Act
 		req := httptest.NewRequest(http.MethodDelete, "/tasks/", nil)
@@ -556,12 +572,13 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockService := core.NewMockTaskService(ctrl)
-		handler := NewHandler(mockService)
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "non-existent"
 
-		mockService.EXPECT().
+		mockTaskService.EXPECT().
 			Delete(taskID).
 			Return(core.ErrTaskNotFound)
 
@@ -576,5 +593,94 @@ func TestHandler_Delete(t *testing.T) {
 		// Assert
 		assert.Equal(t, http.StatusNotFound, res.Code)
 		assert.Contains(t, res.Body.String(), "Task not found")
+	})
+}
+
+func TestHandler_ProcessPrompt(t *testing.T) {
+	t.Run("should process prompt successfully", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+
+		handler := NewHandler(mockTaskService, mockPromptService)
+
+		input := PromptInput{
+			Text: "Create a new task to finish the report",
+		}
+
+		mockPromptService.EXPECT().
+			ProcessPrompt(input.Text).
+			Return("Task created: TASK-123", nil)
+
+		body, err := json.Marshal(input)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodPost, "/prompts", bytes.NewReader(body))
+		w := httptest.NewRecorder()
+
+		handler.ProcessPrompt(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		var response PromptResponse
+		err = json.Unmarshal(w.Body.Bytes(), &response)
+		require.NoError(t, err)
+		assert.Contains(t, response.Response, "TASK-123")
+	})
+
+	t.Run("should handle empty prompt", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+
+		handler := NewHandler(mockTaskService, mockPromptService)
+
+		input := PromptInput{
+			Text: "", // Empty prompt
+		}
+
+		body, err := json.Marshal(input)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodPost, "/prompts", bytes.NewReader(body))
+		w := httptest.NewRecorder()
+
+		handler.ProcessPrompt(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.Contains(t, w.Body.String(), "cannot be empty")
+	})
+
+	t.Run("should handle prompt service error", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockTaskService := core.NewMockTaskService(ctrl)
+		mockPromptService := core.NewMockPromptService(ctrl)
+
+		handler := NewHandler(mockTaskService, mockPromptService)
+
+		input := PromptInput{
+			Text: "Invalid prompt",
+		}
+
+		mockPromptService.EXPECT().
+			ProcessPrompt(input.Text).
+			Return("", errors.New("failed to process prompt"))
+
+		body, err := json.Marshal(input)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodPost, "/prompts", bytes.NewReader(body))
+		w := httptest.NewRecorder()
+
+		handler.ProcessPrompt(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.Contains(t, w.Body.String(), "failed to process prompt")
 	})
 }

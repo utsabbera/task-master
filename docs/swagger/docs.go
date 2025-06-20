@@ -15,6 +15,40 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/prompts": {
+            "post": {
+                "description": "Process a natural language prompt for task management",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "prompts"
+                ],
+                "summary": "Process Task Prompt",
+                "parameters": [
+                    {
+                        "description": "Prompt input",
+                        "name": "prompt",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.PromptInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.PromptResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/tasks": {
             "get": {
                 "description": "List all tasks",
@@ -182,6 +216,22 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "api.PromptInput": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.PromptResponse": {
+            "type": "object",
+            "properties": {
+                "response": {
+                    "type": "string"
+                }
+            }
+        },
         "api.Task": {
             "type": "object",
             "properties": {

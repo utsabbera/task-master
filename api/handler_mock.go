@@ -87,6 +87,18 @@ func (mr *MockHandlerMockRecorder) List(arg0, arg1 any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockHandler)(nil).List), arg0, arg1)
 }
 
+// ProcessPrompt mocks base method.
+func (m *MockHandler) ProcessPrompt(arg0 http.ResponseWriter, arg1 *http.Request) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "ProcessPrompt", arg0, arg1)
+}
+
+// ProcessPrompt indicates an expected call of ProcessPrompt.
+func (mr *MockHandlerMockRecorder) ProcessPrompt(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessPrompt", reflect.TypeOf((*MockHandler)(nil).ProcessPrompt), arg0, arg1)
+}
+
 // Update mocks base method.
 func (m *MockHandler) Update(arg0 http.ResponseWriter, arg1 *http.Request) {
 	m.ctrl.T.Helper()

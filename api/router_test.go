@@ -95,4 +95,21 @@ func TestRouter(t *testing.T) {
 		router.ServeHTTP(rw, req)
 		assert.Equal(t, http.StatusOK, rw.Code)
 	})
+
+	t.Run("POST /prompts", func(t *testing.T) {
+		mockCtrl := gomock.NewController(t)
+		defer mockCtrl.Finish()
+
+		handler := NewMockHandler(mockCtrl)
+		router := NewRouter(handler)
+		rw := httptest.NewRecorder()
+
+		req, err := http.NewRequest(http.MethodPost, "/prompts", nil)
+		require.NoError(t, err)
+
+		handler.EXPECT().ProcessPrompt(rw, req)
+
+		router.ServeHTTP(rw, req)
+		assert.Equal(t, http.StatusOK, rw.Code)
+	})
 }

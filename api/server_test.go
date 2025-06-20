@@ -37,7 +37,8 @@ func TestIntegration_Server(t *testing.T) {
 	t.Run("should create task with title and description", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
 		service := core.NewTaskService(repo)
-		handler := NewHandler(service)
+		promptService := core.NewPromptService(service)
+		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -70,7 +71,8 @@ func TestIntegration_Server(t *testing.T) {
 	t.Run("should create task with due date", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
 		service := core.NewTaskService(repo)
-		handler := NewHandler(service)
+		promptService := core.NewPromptService(service)
+		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -105,7 +107,8 @@ func TestIntegration_Server(t *testing.T) {
 	t.Run("should create task with priority", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
 		service := core.NewTaskService(repo)
-		handler := NewHandler(service)
+		promptService := core.NewPromptService(service)
+		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -140,7 +143,8 @@ func TestIntegration_Server(t *testing.T) {
 	t.Run("should get created task with Id", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
 		service := core.NewTaskService(repo)
-		handler := NewHandler(service)
+		promptService := core.NewPromptService(service)
+		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -186,7 +190,8 @@ func TestIntegration_Server(t *testing.T) {
 	t.Run("should get list of created tasks", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
 		service := core.NewTaskService(repo)
-		handler := NewHandler(service)
+		promptService := core.NewPromptService(service)
+		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -238,7 +243,8 @@ func TestIntegration_Server(t *testing.T) {
 	t.Run("should update created task", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
 		taskService := core.NewTaskService(repo)
-		handler := NewHandler(taskService)
+		promptService := core.NewPromptService(taskService)
+		handler := NewHandler(taskService, promptService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -297,7 +303,8 @@ func TestIntegration_Server(t *testing.T) {
 	t.Run("should delete created task", func(t *testing.T) {
 		repo := core.NewDefaultMemoryRepository()
 		service := core.NewTaskService(repo)
-		handler := NewHandler(service)
+		promptService := core.NewPromptService(service)
+		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -337,4 +344,6 @@ func TestIntegration_Server(t *testing.T) {
 		assert.Equal(t, http.StatusNotFound, getResp.StatusCode)
 		require.NoError(t, getResp.Body.Close())
 	})
+
+	// TODO: Add tests for prompt processing
 }

@@ -24,3 +24,13 @@ type TaskInput struct {
 	Priority    *core.Priority `json:"priority"`
 	DueDate     *time.Time     `json:"dueDate"`
 }
+
+// PromptInput represents a natural language prompt for task management
+type PromptInput struct {
+	Text string `json:"text"`
+}
+
+// PromptResponse represents the response to a natural language prompt
+type PromptResponse struct {
+	Response string `json:"response"`
+}

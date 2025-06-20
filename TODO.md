@@ -4,6 +4,9 @@
 
 ## Features:
 
+- [ ] Add stage mode to show preview before commititng the changes
+- [ ] Add multi action support through prompt
+- [ ] Integrate database to persist data
 - [ ] Add feature to create new task in any status
 - [ ] Add API request validation mechanism
 - [ ] Add more detail to README.md
@@ -15,7 +18,7 @@
 - [ ] Make the UpdatedAt and CreatedAt testable
 - [x] Rename service and repository methods to make it consistent all accross
 
-## Improvements:
+## Tech Enhancements:
 
 - [ ] Add more test coverage
 - [ ] Integrate better logging mechanism

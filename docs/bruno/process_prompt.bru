@@ -1,0 +1,21 @@
+meta {
+  name: Process Prompt
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/prompts
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "text": "Create a task to finish the report"
+  }
+}

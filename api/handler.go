@@ -25,16 +25,21 @@ type Handler interface {
 
 	// Delete deletes a task by its ID.
 	Delete(w http.ResponseWriter, r *http.Request)
+	
+	// ProcessPrompt handles natural language prompts for task management.
+	ProcessPrompt(w http.ResponseWriter, r *http.Request)
 }
 
 type handler struct {
-	taskService core.TaskService
+	taskService  core.TaskService
+	promptService core.PromptService
 }
 
 // NewHandler returns a new instance of Handler for task operations.
-func NewHandler(taskService core.TaskService) Handler {
+func NewHandler(taskService core.TaskService, promptService core.PromptService) Handler {
 	return &handler{
-		taskService: taskService,
+		taskService:  taskService,
+		promptService: promptService,
 	}
 }
 
@@ -210,4 +215,44 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// ProcessPrompt godoc
+// @Summary Process Task Prompt
+// @Description Process a natural language prompt for task management
+// @Tags prompts
+// @Accept json
+// @Produce json
+// @Param prompt body PromptInput true "Prompt input"
+// @Success 200 {object} PromptResponse
+// @Router /prompts [post]
+func (h *handler) ProcessPrompt(w http.ResponseWriter, r *http.Request) {
+	var input PromptInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if input.Text == "" {
+		http.Error(w, "Prompt text cannot be empty", http.StatusBadRequest)
+		return
+	}
+
+	response, err := h.promptService.ProcessPrompt(input.Text)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	
+	resp := PromptResponse{
+		Response: response,
+	}
+	
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }
