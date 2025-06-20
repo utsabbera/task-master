@@ -248,10 +248,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "priority": {
-                    "$ref": "#/definitions/core.Priority"
+                    "$ref": "#/definitions/task.Priority"
                 },
                 "status": {
-                    "$ref": "#/definitions/core.Status"
+                    "$ref": "#/definitions/task.Status"
                 },
                 "title": {
                     "type": "string"
@@ -271,14 +271,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "priority": {
-                    "$ref": "#/definitions/core.Priority"
+                    "$ref": "#/definitions/task.Priority"
                 },
                 "title": {
                     "type": "string"
                 }
             }
         },
-        "core.Priority": {
+        "task.Priority": {
             "type": "integer",
             "enum": [
                 1,
@@ -291,7 +291,7 @@ const docTemplate = `{
                 "PriorityHigh"
             ]
         },
-        "core.Status": {
+        "task.Status": {
             "type": "string",
             "enum": [
                 "NOT_STARTED",

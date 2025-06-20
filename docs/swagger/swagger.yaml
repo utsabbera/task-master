@@ -21,9 +21,9 @@ definitions:
       id:
         type: string
       priority:
-        $ref: '#/definitions/core.Priority'
+        $ref: '#/definitions/task.Priority'
       status:
-        $ref: '#/definitions/core.Status'
+        $ref: '#/definitions/task.Status'
       title:
         type: string
       updatedAt:
@@ -36,11 +36,11 @@ definitions:
       dueDate:
         type: string
       priority:
-        $ref: '#/definitions/core.Priority'
+        $ref: '#/definitions/task.Priority'
       title:
         type: string
     type: object
-  core.Priority:
+  task.Priority:
     enum:
     - 1
     - 2
@@ -50,7 +50,7 @@ definitions:
     - PriorityLow
     - PriorityMedium
     - PriorityHigh
-  core.Status:
+  task.Status:
     enum:
     - NOT_STARTED
     - IN_PROGRESS
