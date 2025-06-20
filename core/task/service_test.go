@@ -1,4 +1,4 @@
-package core
+package task
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ func TestTaskService_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		priority := PriorityMedium
 		due := time.Now().Add(24 * time.Hour).Truncate(time.Second)
@@ -49,7 +49,7 @@ func TestTaskService_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		due := time.Now().Add(24 * time.Hour).Truncate(time.Second)
 
@@ -78,7 +78,7 @@ func TestTaskService_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		priority := PriorityMedium
 
@@ -107,7 +107,7 @@ func TestTaskService_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		task, err := service.Create("", "Description", nil, nil)
 
@@ -121,7 +121,7 @@ func TestTaskService_Create(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		mockRepo.EXPECT().
 			Create(gomock.Any()).
@@ -141,7 +141,7 @@ func TestTaskService_Get(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		mockRepo.EXPECT().
 			Get("TEST-ID").
@@ -159,7 +159,7 @@ func TestTaskService_Get(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		mockRepo.EXPECT().
 			Get("UNKNOWN").
@@ -179,7 +179,7 @@ func TestTaskService_List(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		tasks := []*Task{
 			{ID: "1", Title: "Task 1"},
@@ -202,7 +202,7 @@ func TestTaskService_List(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		mockRepo.EXPECT().
 			List().
@@ -219,7 +219,7 @@ func TestTaskService_List(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		mockRepo.EXPECT().
 			List().
@@ -239,7 +239,7 @@ func TestTaskService_Update(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		task := &Task{ID: "TEST-ID", Title: "Updated Task"}
 
@@ -257,7 +257,7 @@ func TestTaskService_Update(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		task := &Task{ID: "TEST-ID", Title: "Updated Task"}
 
@@ -278,7 +278,7 @@ func TestTaskService_Delete(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		mockRepo.EXPECT().
 			Delete("TEST-ID").
@@ -294,7 +294,7 @@ func TestTaskService_Delete(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockRepo := NewMockRepository(ctrl)
-		service := NewTaskService(mockRepo)
+		service := NewService(mockRepo)
 
 		mockRepo.EXPECT().
 			Delete("TEST-ID").

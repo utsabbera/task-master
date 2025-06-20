@@ -12,7 +12,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/utsabbera/task-master/core"
+	"github.com/utsabbera/task-master/core/chat"
+	"github.com/utsabbera/task-master/core/task"
 	"github.com/utsabbera/task-master/pkg/match"
 	"github.com/utsabbera/task-master/pkg/util"
 	"go.uber.org/mock/gomock"
@@ -24,14 +25,14 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		input := TaskInput{
 			Title:       "Test Task",
 			Description: "Test Description",
-			Priority:    util.Ptr(core.PriorityMedium),
+			Priority:    util.Ptr(task.PriorityMedium),
 			DueDate:     util.Ptr(time.Date(2025, 1, 1, 12, 0, 0, 0, time.UTC)),
 		}
 
@@ -44,11 +45,11 @@ func TestHandler_Create(t *testing.T) {
 				input.Priority,
 				input.DueDate,
 			).
-			Return(&core.Task{
+			Return(&task.Task{
 				ID:          "task-123",
 				Title:       input.Title,
 				Description: input.Description,
-				Status:      core.StatusNotStarted,
+				Status:      task.StatusNotStarted,
 				Priority:    input.Priority,
 				DueDate:     input.DueDate,
 			}, nil)
@@ -71,7 +72,7 @@ func TestHandler_Create(t *testing.T) {
 			ID:          "task-123",
 			Title:       input.Title,
 			Description: input.Description,
-			Status:      core.StatusNotStarted,
+			Status:      task.StatusNotStarted,
 			Priority:    input.Priority,
 			DueDate:     input.DueDate,
 		}
@@ -83,8 +84,8 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		// Act
@@ -104,14 +105,14 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		input := TaskInput{
 			Title:       "Test Task",
 			Description: "Test Description",
-			Priority:    util.Ptr(core.PriorityMedium),
+			Priority:    util.Ptr(task.PriorityMedium),
 		}
 
 		inputBytes, err := json.Marshal(input)
@@ -145,21 +146,21 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "task-123"
-		task := &core.Task{
+		existingTask := &task.Task{
 			ID:          taskID,
 			Title:       "Test Task",
 			Description: "Test Description",
-			Status:      core.StatusNotStarted,
+			Status:      task.StatusNotStarted,
 		}
 
 		mockTaskService.EXPECT().
 			Get(taskID).
-			Return(task, nil)
+			Return(existingTask, nil)
 
 		// Act
 		req := httptest.NewRequest(http.MethodGet, "/tasks/"+taskID, nil)
@@ -178,9 +179,9 @@ func TestHandler_Get(t *testing.T) {
 
 		expected := Task{
 			ID:          taskID,
-			Title:       task.Title,
-			Description: task.Description,
-			Status:      core.StatusNotStarted,
+			Title:       existingTask.Title,
+			Description: existingTask.Description,
+			Status:      task.StatusNotStarted,
 		}
 		assert.Equal(t, expected, response)
 	})
@@ -190,8 +191,8 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		// Act
@@ -210,15 +211,15 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "non-existent"
 
 		mockTaskService.EXPECT().
 			Get(taskID).
-			Return(nil, core.ErrTaskNotFound)
+			Return(nil, task.ErrTaskNotFound)
 
 		// Act
 		req := httptest.NewRequest(http.MethodGet, "/tasks/"+taskID, nil)
@@ -240,22 +241,22 @@ func TestHandler_List(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
-		tasks := []*core.Task{
+		tasks := []*task.Task{
 			{
 				ID:          "task-1",
 				Title:       "Task 1",
 				Description: "Description 1",
-				Status:      core.StatusNotStarted,
+				Status:      task.StatusNotStarted,
 			},
 			{
 				ID:          "task-2",
 				Title:       "Task 2",
 				Description: "Description 2",
-				Status:      core.StatusInProgress,
+				Status:      task.StatusInProgress,
 			},
 		}
 
@@ -281,13 +282,13 @@ func TestHandler_List(t *testing.T) {
 				ID:          "task-1",
 				Title:       "Task 1",
 				Description: "Description 1",
-				Status:      core.StatusNotStarted,
+				Status:      task.StatusNotStarted,
 			},
 			{
 				ID:          "task-2",
 				Title:       "Task 2",
 				Description: "Description 2",
-				Status:      core.StatusInProgress,
+				Status:      task.StatusInProgress,
 			},
 		}
 		assert.Equal(t, expected, response)
@@ -298,8 +299,8 @@ func TestHandler_List(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		mockTaskService.EXPECT().
@@ -324,15 +325,15 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "task-123"
 		input := TaskInput{
 			Title:       "Updated Task",
 			Description: "Updated Description",
-			Priority:    util.Ptr(core.PriorityHigh),
+			Priority:    util.Ptr(task.PriorityHigh),
 			DueDate:     util.Ptr(time.Date(2025, 2, 1, 12, 0, 0, 0, time.UTC)),
 		}
 
@@ -341,19 +342,19 @@ func TestHandler_Update(t *testing.T) {
 
 		mockTaskService.EXPECT().
 			Get(taskID).
-			Return(&core.Task{
+			Return(&task.Task{
 				ID:          taskID,
 				Title:       "Original Task",
 				Description: "Original Description",
-				Status:      core.StatusNotStarted,
+				Status:      task.StatusNotStarted,
 			}, nil)
 
 		mockTaskService.EXPECT().
-			Update(match.PtrTo(core.Task{
+			Update(match.PtrTo(task.Task{
 				ID:          taskID,
 				Title:       input.Title,
 				Description: input.Description,
-				Status:      core.StatusNotStarted,
+				Status:      task.StatusNotStarted,
 				Priority:    input.Priority,
 				DueDate:     input.DueDate,
 			})).
@@ -378,7 +379,7 @@ func TestHandler_Update(t *testing.T) {
 			ID:          taskID,
 			Title:       input.Title,
 			Description: input.Description,
-			Status:      core.StatusNotStarted,
+			Status:      task.StatusNotStarted,
 			Priority:    input.Priority,
 			DueDate:     input.DueDate,
 		}
@@ -390,8 +391,8 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		input := TaskInput{
@@ -419,8 +420,8 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "task-123"
@@ -443,8 +444,8 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "non-existent"
@@ -458,7 +459,7 @@ func TestHandler_Update(t *testing.T) {
 
 		mockTaskService.EXPECT().
 			Get(taskID).
-			Return(nil, core.ErrTaskNotFound)
+			Return(nil, task.ErrTaskNotFound)
 
 		// Act
 		req := httptest.NewRequest(http.MethodPut, "/tasks/"+taskID, bytes.NewReader(inputBytes))
@@ -478,8 +479,8 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "task-123"
@@ -493,11 +494,11 @@ func TestHandler_Update(t *testing.T) {
 
 		mockTaskService.EXPECT().
 			Get(taskID).
-			Return(&core.Task{
+			Return(&task.Task{
 				ID:          taskID,
 				Title:       "Original Task",
 				Description: "Original Description",
-				Status:      core.StatusNotStarted,
+				Status:      task.StatusNotStarted,
 			}, nil)
 
 		mockTaskService.EXPECT().
@@ -524,8 +525,8 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "task-123"
@@ -552,8 +553,8 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		// Act
@@ -572,15 +573,15 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 		handler := NewHandler(mockTaskService, mockPromptService)
 
 		taskID := "non-existent"
 
 		mockTaskService.EXPECT().
 			Delete(taskID).
-			Return(core.ErrTaskNotFound)
+			Return(task.ErrTaskNotFound)
 
 		// Act
 		req := httptest.NewRequest(http.MethodDelete, "/tasks/"+taskID, nil)
@@ -601,8 +602,8 @@ func TestHandler_ProcessPrompt(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 
 		handler := NewHandler(mockTaskService, mockPromptService)
 
@@ -634,8 +635,8 @@ func TestHandler_ProcessPrompt(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 
 		handler := NewHandler(mockTaskService, mockPromptService)
 
@@ -659,8 +660,8 @@ func TestHandler_ProcessPrompt(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := core.NewMockTaskService(ctrl)
-		mockPromptService := core.NewMockPromptService(ctrl)
+		mockTaskService := task.NewMockService(ctrl)
+		mockPromptService := chat.NewMockService(ctrl)
 
 		handler := NewHandler(mockTaskService, mockPromptService)
 

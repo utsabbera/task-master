@@ -1,4 +1,4 @@
-package core
+package task
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ var (
 	ErrInvalidTask = errors.New("invalid task")
 )
 
-//go:generate mockgen -destination=repository_mock.go -package=core . Repository
+//go:generate mockgen -destination=repository_mock.go -package=task . Repository
 
 // Repository defines the interface for task data storage operations
 type Repository interface {

@@ -1,8 +1,10 @@
 package api
 
-import "github.com/utsabbera/task-master/core"
+import (
+	"github.com/utsabbera/task-master/core/task"
+)
 
-func mapTaskToResponse(task *core.Task) Task {
+func mapTaskToResponse(task *task.Task) Task {
 	return Task{
 		ID:          task.ID,
 		Title:       task.Title,
@@ -15,7 +17,7 @@ func mapTaskToResponse(task *core.Task) Task {
 	}
 }
 
-func mapTasksToResponse(tasks []*core.Task) []Task {
+func mapTasksToResponse(tasks []*task.Task) []Task {
 	response := make([]Task, 0, len(tasks))
 	for _, t := range tasks {
 		response = append(response, mapTaskToResponse(t))

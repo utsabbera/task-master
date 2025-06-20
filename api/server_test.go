@@ -11,7 +11,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/utsabbera/task-master/core"
+	"github.com/utsabbera/task-master/core/chat"
+	"github.com/utsabbera/task-master/core/task"
 	"github.com/utsabbera/task-master/pkg/util"
 )
 
@@ -35,9 +36,9 @@ func TestNewServer(t *testing.T) {
 
 func TestIntegration_Server(t *testing.T) {
 	t.Run("should create task with title and description", func(t *testing.T) {
-		repo := core.NewDefaultMemoryRepository()
-		service := core.NewTaskService(repo)
-		promptService := core.NewPromptService(service)
+		repo := task.NewDefaultMemoryRepository()
+		service := task.NewService(repo)
+		promptService := chat.NewService(service)
 		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
 
@@ -69,9 +70,9 @@ func TestIntegration_Server(t *testing.T) {
 	})
 
 	t.Run("should create task with due date", func(t *testing.T) {
-		repo := core.NewDefaultMemoryRepository()
-		service := core.NewTaskService(repo)
-		promptService := core.NewPromptService(service)
+		repo := task.NewDefaultMemoryRepository()
+		service := task.NewService(repo)
+		promptService := chat.NewService(service)
 		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
 
@@ -105,9 +106,9 @@ func TestIntegration_Server(t *testing.T) {
 	})
 
 	t.Run("should create task with priority", func(t *testing.T) {
-		repo := core.NewDefaultMemoryRepository()
-		service := core.NewTaskService(repo)
-		promptService := core.NewPromptService(service)
+		repo := task.NewDefaultMemoryRepository()
+		service := task.NewService(repo)
+		promptService := chat.NewService(service)
 		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
 
@@ -117,7 +118,7 @@ func TestIntegration_Server(t *testing.T) {
 		input := TaskInput{
 			Title:       "Test Task",
 			Description: "Test description",
-			Priority:    util.Ptr(core.PriorityHigh),
+			Priority:    util.Ptr(task.PriorityHigh),
 		}
 		body, err := json.Marshal(input)
 		require.NoError(t, err)
@@ -141,9 +142,9 @@ func TestIntegration_Server(t *testing.T) {
 	})
 
 	t.Run("should get created task with Id", func(t *testing.T) {
-		repo := core.NewDefaultMemoryRepository()
-		service := core.NewTaskService(repo)
-		promptService := core.NewPromptService(service)
+		repo := task.NewDefaultMemoryRepository()
+		service := task.NewService(repo)
+		promptService := chat.NewService(service)
 		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
 
@@ -188,9 +189,9 @@ func TestIntegration_Server(t *testing.T) {
 	})
 
 	t.Run("should get list of created tasks", func(t *testing.T) {
-		repo := core.NewDefaultMemoryRepository()
-		service := core.NewTaskService(repo)
-		promptService := core.NewPromptService(service)
+		repo := task.NewDefaultMemoryRepository()
+		service := task.NewService(repo)
+		promptService := chat.NewService(service)
 		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
 
@@ -241,9 +242,9 @@ func TestIntegration_Server(t *testing.T) {
 	})
 
 	t.Run("should update created task", func(t *testing.T) {
-		repo := core.NewDefaultMemoryRepository()
-		taskService := core.NewTaskService(repo)
-		promptService := core.NewPromptService(taskService)
+		repo := task.NewDefaultMemoryRepository()
+		taskService := task.NewService(repo)
+		promptService := chat.NewService(taskService)
 		handler := NewHandler(taskService, promptService)
 		router := NewRouter(handler)
 
@@ -273,7 +274,7 @@ func TestIntegration_Server(t *testing.T) {
 		updateInput := TaskInput{
 			Title:       "Updated Title",
 			Description: "Updated Description",
-			Priority:    util.Ptr(core.PriorityMedium),
+			Priority:    util.Ptr(task.PriorityMedium),
 		}
 		updateBody, err := json.Marshal(updateInput)
 		require.NoError(t, err)
@@ -301,9 +302,9 @@ func TestIntegration_Server(t *testing.T) {
 	})
 
 	t.Run("should delete created task", func(t *testing.T) {
-		repo := core.NewDefaultMemoryRepository()
-		service := core.NewTaskService(repo)
-		promptService := core.NewPromptService(service)
+		repo := task.NewDefaultMemoryRepository()
+		service := task.NewService(repo)
+		promptService := chat.NewService(service)
 		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
 

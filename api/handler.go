@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/utsabbera/task-master/core"
+	"github.com/utsabbera/task-master/core/chat"
+	"github.com/utsabbera/task-master/core/task"
 )
 
 //go:generate mockgen -destination=handler_mock.go -package=api . Handler
@@ -25,20 +26,20 @@ type Handler interface {
 
 	// Delete deletes a task by its ID.
 	Delete(w http.ResponseWriter, r *http.Request)
-	
+
 	// ProcessPrompt handles natural language prompts for task management.
 	ProcessPrompt(w http.ResponseWriter, r *http.Request)
 }
 
 type handler struct {
-	taskService  core.TaskService
-	promptService core.PromptService
+	taskService   task.Service
+	promptService chat.Service
 }
 
 // NewHandler returns a new instance of Handler for task operations.
-func NewHandler(taskService core.TaskService, promptService core.PromptService) Handler {
+func NewHandler(taskService task.Service, promptService chat.Service) Handler {
 	return &handler{
-		taskService:  taskService,
+		taskService:   taskService,
 		promptService: promptService,
 	}
 }
@@ -246,11 +247,11 @@ func (h *handler) ProcessPrompt(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	
+
 	resp := PromptResponse{
 		Response: response,
 	}
-	
+
 	if err := json.NewEncoder(w).Encode(resp); err != nil {
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)
 		return

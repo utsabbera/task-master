@@ -3,7 +3,8 @@ package api
 import (
 	"net/http"
 
-	"github.com/utsabbera/task-master/core"
+	"github.com/utsabbera/task-master/core/chat"
+	"github.com/utsabbera/task-master/core/task"
 	"github.com/utsabbera/task-master/pkg/middleware"
 )
 
@@ -19,9 +20,9 @@ func NewServer(cfg ServerConfig) *http.Server {
 		addr = ":8080"
 	}
 
-	repo := core.NewDefaultMemoryRepository()
-	taskService := core.NewTaskService(repo)
-	promptService := core.NewPromptService(taskService)
+	repo := task.NewDefaultMemoryRepository()
+	taskService := task.NewService(repo)
+	promptService := chat.NewService(taskService)
 	handler := NewHandler(taskService, promptService)
 
 	middlewares := []middleware.Middleware{

@@ -1,32 +1,34 @@
-package core
+package chat
 
-//go:generate mockgen -destination=mock_prompt_service.go -package=core . PromptService
+import "github.com/utsabbera/task-master/core/task"
 
-// PromptService defines the interface for processing natural language prompts
+//go:generate mockgen -destination=service_mock.go -package=chat . Service
+
+// Service defines the interface for processing natural language prompts
 // for task management operations
-type PromptService interface {
+type Service interface {
 	// ProcessPrompt handles a natural language prompt and performs the appropriate task operation
 	ProcessPrompt(prompt string) (string, error)
 }
 
-type promptService struct {
-	taskService TaskService
+type service struct {
+	taskService task.Service
 }
 
-// NewPromptService creates a new prompt service with the provided task service
-func NewPromptService(taskService TaskService) PromptService {
-	return &promptService{
+// NewService creates a new prompt service with the provided task service
+func NewService(taskService task.Service) Service {
+	return &service{
 		taskService: taskService,
 	}
 }
 
 // ProcessPrompt handles a natural language prompt and delegates to the appropriate task service method
-func (s *promptService) ProcessPrompt(prompt string) (string, error) {
+func (s *service) ProcessPrompt(prompt string) (string, error) {
 	// This is a placeholder implementation that will be expanded in future commits
 	// In a full implementation, this would:
 	// 1. Parse the prompt using NLP to determine intent (create, update, delete, list, etc.)
 	// 2. Extract relevant information (task details, IDs, etc.)
-	// 3. Call the appropriate TaskService method
+	// 3. Call the appropriate Service method
 	// 4. Return a human-readable response message
 
 	// For now, let's implement a very simple version that creates a task with the prompt as title

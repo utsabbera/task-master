@@ -1,10 +1,11 @@
-package core
+package chat
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/utsabbera/task-master/core/task"
 	"go.uber.org/mock/gomock"
 )
 
@@ -13,12 +14,12 @@ func TestPromptService_ProcessPrompt(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := NewMockTaskService(ctrl)
-		promptService := NewPromptService(mockTaskService)
+		mockTaskService := task.NewMockService(ctrl)
+		promptService := NewService(mockTaskService)
 
 		mockTaskService.EXPECT().
 			Create("Create a new task", "", nil, nil).
-			Return(&Task{
+			Return(&task.Task{
 				ID:    "TASK-123",
 				Title: "Create a new task",
 			}, nil)
@@ -33,8 +34,8 @@ func TestPromptService_ProcessPrompt(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockTaskService := NewMockTaskService(ctrl)
-		promptService := NewPromptService(mockTaskService)
+		mockTaskService := task.NewMockService(ctrl)
+		promptService := NewService(mockTaskService)
 
 		mockTaskService.EXPECT().
 			Create("Invalid task", "", nil, nil).

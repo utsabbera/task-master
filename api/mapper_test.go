@@ -5,17 +5,17 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/utsabbera/task-master/core"
+	"github.com/utsabbera/task-master/core/task"
 )
 
 func TestMapTaskToResponse(t *testing.T) {
 	due := time.Now().Add(24 * time.Hour)
-	priority := core.PriorityHigh
-	coreTask := &core.Task{
+	priority := task.PriorityHigh
+	coreTask := &task.Task{
 		ID:          "1",
 		Title:       "Test Task",
 		Description: "Test Desc",
-		Status:      core.StatusInProgress,
+		Status:      task.StatusInProgress,
 		Priority:    &priority,
 		DueDate:     &due,
 		CreatedAt:   time.Now(),
@@ -35,7 +35,7 @@ func TestMapTaskToResponse(t *testing.T) {
 }
 
 func TestMapTasksToResponse(t *testing.T) {
-	coreTasks := []*core.Task{
+	coreTasks := []*task.Task{
 		{ID: "1", Title: "A"},
 		{ID: "2", Title: "B"},
 	}
