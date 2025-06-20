@@ -9,7 +9,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestPromptService_ProcessPrompt(t *testing.T) {
+func TestService_ProcessPrompt(t *testing.T) {
 	t.Run("should create task from prompt", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()

@@ -10,7 +10,7 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func TestTaskService_Create(t *testing.T) {
+func TestService_Create(t *testing.T) {
 	t.Run("should create task with valid data", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -135,7 +135,7 @@ func TestTaskService_Create(t *testing.T) {
 	})
 }
 
-func TestTaskService_Get(t *testing.T) {
+func TestService_Get(t *testing.T) {
 	t.Run("should get task by id", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -173,7 +173,7 @@ func TestTaskService_Get(t *testing.T) {
 	})
 }
 
-func TestTaskService_List(t *testing.T) {
+func TestService_List(t *testing.T) {
 	t.Run("should list all tasks", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -233,7 +233,7 @@ func TestTaskService_List(t *testing.T) {
 	})
 }
 
-func TestTaskService_Update(t *testing.T) {
+func TestService_Update(t *testing.T) {
 	t.Run("should update task", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -272,7 +272,7 @@ func TestTaskService_Update(t *testing.T) {
 	})
 }
 
-func TestTaskService_Delete(t *testing.T) {
+func TestService_Delete(t *testing.T) {
 	t.Run("should delete task", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
