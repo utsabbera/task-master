@@ -9,13 +9,13 @@ pre-commit:
       run: golangci-lint run --fix
     test:
       run: go test ./...
+    docs:
+      run: make docs
 
 # Define pre-push hooks
 pre-push:
   commands:
-    test-all:
+    test:
       run: go test ./... -race
-    lint-all:
+    lint:
       run: golangci-lint run
-    docs:
-      run: make docs
