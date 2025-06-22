@@ -3,9 +3,6 @@ package task
 import (
 	"errors"
 	"sync"
-	"time"
-
-	"github.com/utsabbera/task-master/pkg/idgen"
 )
 
 var (
@@ -23,61 +20,47 @@ type Repository interface {
 	Create(task *Task) error
 
 	// Get retrieves a task by its ID
+	// Returns ErrTaskNotFound if the task doesn't exist
 	Get(id string) (*Task, error)
 
 	// List returns all tasks stored in the repository
 	List() ([]*Task, error)
 
 	// Update modifies an existing task in the repository
+	// Returns ErrTaskNotFound if the task doesn't exist
 	Update(task *Task) error
 
 	// Delete removes a task from the repository
+	// Returns ErrTaskNotFound if the task doesn't exist
 	Delete(id string) error
 }
 
 // MemoryRepository is an in-memory implementation of Repository
 // that stores tasks in a map and uses an ID generator for task IDs
 type MemoryRepository struct {
-	tasks     map[string]*Task
-	generator idgen.Generator
-	mu        sync.RWMutex
+	tasks map[string]*Task
+	mu    sync.RWMutex
 }
 
 // NewMemoryRepository creates a new memory repository with the given ID generator
-func NewMemoryRepository(idGenerator idgen.Generator) *MemoryRepository {
+func NewMemoryRepository() *MemoryRepository {
 	return &MemoryRepository{
-		tasks:     make(map[string]*Task),
-		generator: idGenerator,
+		tasks: make(map[string]*Task),
 	}
 }
 
-// NewDefaultMemoryRepository creates a new MemoryRepository with a default sequential ID generator
-func NewDefaultMemoryRepository() *MemoryRepository {
-	generator := idgen.NewSequential("TASK-", 1, 6)
-	return NewMemoryRepository(generator)
-}
-
-// Create stores a new task in memory and assigns it a unique ID and timestamps
 func (r *MemoryRepository) Create(t *Task) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	// Set ID if not already set
 	if t.ID == "" {
-		t.ID = r.generator.Next()
+		return ErrInvalidTask
 	}
-
-	// Set timestamps
-	now := time.Now()
-	t.CreatedAt = now
-	t.UpdatedAt = now
 
 	r.tasks[t.ID] = t
 	return nil
 }
 
-// Get retrieves a task by its ID from memory
-// Returns ErrTaskNotFound if the task doesn't exist
 func (r *MemoryRepository) Get(id string) (*Task, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -90,7 +73,6 @@ func (r *MemoryRepository) Get(id string) (*Task, error) {
 	return t, nil
 }
 
-// List returns all tasks stored in memory as a slice
 func (r *MemoryRepository) List() ([]*Task, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -103,8 +85,6 @@ func (r *MemoryRepository) List() ([]*Task, error) {
 	return tasks, nil
 }
 
-// Update modifies an existing task in memory and updates the UpdatedAt timestamp
-// Returns ErrTaskNotFound if the task doesn't exist
 func (r *MemoryRepository) Update(t *Task) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -113,13 +93,10 @@ func (r *MemoryRepository) Update(t *Task) error {
 		return ErrTaskNotFound
 	}
 
-	t.UpdatedAt = time.Now()
 	r.tasks[t.ID] = t
 	return nil
 }
 
-// Delete removes a task from memory by its ID
-// Returns ErrTaskNotFound if the task doesn't exist
 func (r *MemoryRepository) Delete(id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()

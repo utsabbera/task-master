@@ -2,10 +2,12 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/utsabbera/task-master/core/chat"
-	"github.com/utsabbera/task-master/core/task"
+
+	taskcore "github.com/utsabbera/task-master/core/task"
 )
 
 //go:generate mockgen -destination=handler_mock.go -package=api . Handler
@@ -32,12 +34,12 @@ type Handler interface {
 }
 
 type handler struct {
-	taskService   task.Service
+	taskService   taskcore.Service
 	promptService chat.Service
 }
 
 // NewHandler returns a new instance of Handler for task operations.
-func NewHandler(taskService task.Service, promptService chat.Service) Handler {
+func NewHandler(taskService taskcore.Service, promptService chat.Service) Handler {
 	return &handler{
 		taskService:   taskService,
 		promptService: promptService,
@@ -66,7 +68,20 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := h.taskService.Create(input.Title, input.Description, input.Priority, input.DueDate)
+	if input.Title == "" {
+		http.Error(w, "Title cannot be empty", http.StatusBadRequest)
+		return
+	}
+
+	task := &taskcore.Task{
+		Title:       input.Title,
+		Description: input.Description,
+		Status:      input.Status,
+		Priority:    input.Priority,
+		DueDate:     input.DueDate,
+	}
+
+	err = h.taskService.Create(task)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -93,7 +108,7 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {string} string "Task not found"
 // @Router /tasks/{id} [get]
 func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id") // TODO: Declare a constant for the id
+	id := r.PathValue("id")
 	if id == "" {
 		http.Error(w, "Missing task ID", http.StatusBadRequest)
 		return
@@ -101,7 +116,7 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 
 	task, err := h.taskService.Get(id)
 	if err != nil {
-		http.Error(w, "Task not found", http.StatusNotFound)
+		handleError(w, err)
 		return
 	}
 
@@ -141,15 +156,15 @@ func (h *handler) List(w http.ResponseWriter, r *http.Request) {
 
 // Update godoc
 // @Summary Update Task
-// @Description Update a task by ID
+// @Description Partially update a task by ID
 // @Tags tasks
 // @Accept json
 // @Produce json
 // @Param id path string true "Task ID"
-// @Param task body TaskInput true "Task input"
+// @Param task body TaskInput true "Task fields to update"
 // @Success 200 {object} Task
 // @Failure 404 {string} string "Task not found"
-// @Router /tasks/{id} [put]
+// @Router /tasks/{id} [patch]
 func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	if id == "" {
@@ -169,19 +184,17 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := h.taskService.Get(id)
-	if err != nil {
-		http.Error(w, "Task not found", http.StatusNotFound)
-		return
+	patch := &taskcore.Task{
+		Title:       input.Title,
+		Description: input.Description,
+		Status:      input.Status,
+		Priority:    input.Priority,
+		DueDate:     input.DueDate,
 	}
 
-	task.Title = input.Title
-	task.Description = input.Description
-	task.Priority = input.Priority
-	task.DueDate = input.DueDate
-
-	if err := h.taskService.Update(task); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	task, err := h.taskService.Update(id, patch)
+	if err != nil {
+		handleError(w, err)
 		return
 	}
 
@@ -211,7 +224,7 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.taskService.Delete(id); err != nil {
-		http.Error(w, "Task not found", http.StatusNotFound)
+		handleError(w, err)
 		return
 	}
 
@@ -256,4 +269,13 @@ func (h *handler) ProcessPrompt(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)
 		return
 	}
+}
+
+func handleError(w http.ResponseWriter, err error) {
+	if errors.Is(err, taskcore.ErrTaskNotFound) {
+		http.Error(w, "Task not found", http.StatusNotFound)
+		return
+	}
+
+	http.Error(w, err.Error(), http.StatusInternalServerError)
 }

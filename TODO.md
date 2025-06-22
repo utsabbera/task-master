@@ -2,6 +2,10 @@
 
 - [x] Fix `make run`
 
+## Review:
+
+- Review the usages of pointers in service and repository
+
 ## Features:
 
 - [ ] Add stage mode to show preview before commititng the changes

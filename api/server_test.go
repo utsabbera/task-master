@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/utsabbera/task-master/core/chat"
 	"github.com/utsabbera/task-master/core/task"
+	"github.com/utsabbera/task-master/pkg/idgen"
 	"github.com/utsabbera/task-master/pkg/util"
 )
 
@@ -36,8 +37,10 @@ func TestNewServer(t *testing.T) {
 
 func TestIntegration_Server(t *testing.T) {
 	t.Run("should create task with title and description", func(t *testing.T) {
-		repo := task.NewDefaultMemoryRepository()
-		service := task.NewService(repo)
+		idGen := idgen.NewSequential("TASK-", 1, 3)
+		clock := util.NewClock()
+		repo := task.NewMemoryRepository()
+		service := task.NewService(repo, idGen, clock)
 		promptService := chat.NewService(service)
 		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
@@ -64,14 +67,17 @@ func TestIntegration_Server(t *testing.T) {
 		err = json.Unmarshal(respBody, &task)
 		require.NoError(t, err)
 
+		assert.Equal(t, "TASK-001", task.ID)
 		assert.Equal(t, input.Title, task.Title)
 		assert.Equal(t, input.Description, task.Description)
 		assert.NotEmpty(t, task.ID)
 	})
 
 	t.Run("should create task with due date", func(t *testing.T) {
-		repo := task.NewDefaultMemoryRepository()
-		service := task.NewService(repo)
+		idGen := idgen.NewSequential("TASK-", 1, 3)
+		clock := util.NewClock()
+		repo := task.NewMemoryRepository()
+		service := task.NewService(repo, idGen, clock)
 		promptService := chat.NewService(service)
 		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
@@ -99,6 +105,7 @@ func TestIntegration_Server(t *testing.T) {
 		err = json.Unmarshal(respBody, &task)
 		require.NoError(t, err)
 
+		assert.Equal(t, "TASK-001", task.ID)
 		assert.Equal(t, input.Title, task.Title)
 		assert.Equal(t, input.Description, task.Description)
 		assert.Equal(t, input.DueDate, task.DueDate)
@@ -106,8 +113,10 @@ func TestIntegration_Server(t *testing.T) {
 	})
 
 	t.Run("should create task with priority", func(t *testing.T) {
-		repo := task.NewDefaultMemoryRepository()
-		service := task.NewService(repo)
+		idGen := idgen.NewSequential("TASK-", 1, 3)
+		clock := util.NewClock()
+		repo := task.NewMemoryRepository()
+		service := task.NewService(repo, idGen, clock)
 		promptService := chat.NewService(service)
 		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
@@ -135,6 +144,7 @@ func TestIntegration_Server(t *testing.T) {
 		err = json.Unmarshal(respBody, &task)
 		require.NoError(t, err)
 
+		assert.Equal(t, "TASK-001", task.ID)
 		assert.Equal(t, input.Title, task.Title)
 		assert.Equal(t, input.Description, task.Description)
 		assert.Equal(t, input.Priority, task.Priority)
@@ -142,8 +152,10 @@ func TestIntegration_Server(t *testing.T) {
 	})
 
 	t.Run("should get created task with Id", func(t *testing.T) {
-		repo := task.NewDefaultMemoryRepository()
-		service := task.NewService(repo)
+		idGen := idgen.NewSequential("TASK-", 1, 3)
+		clock := util.NewClock()
+		repo := task.NewMemoryRepository()
+		service := task.NewService(repo, idGen, clock)
 		promptService := chat.NewService(service)
 		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
@@ -189,8 +201,10 @@ func TestIntegration_Server(t *testing.T) {
 	})
 
 	t.Run("should get list of created tasks", func(t *testing.T) {
-		repo := task.NewDefaultMemoryRepository()
-		service := task.NewService(repo)
+		idGen := idgen.NewSequential("TASK-", 1, 3)
+		clock := util.NewClock()
+		repo := task.NewMemoryRepository()
+		service := task.NewService(repo, idGen, clock)
 		promptService := chat.NewService(service)
 		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)
@@ -242,8 +256,10 @@ func TestIntegration_Server(t *testing.T) {
 	})
 
 	t.Run("should update created task", func(t *testing.T) {
-		repo := task.NewDefaultMemoryRepository()
-		taskService := task.NewService(repo)
+		idGen := idgen.NewSequential("TASK-", 1, 3)
+		clock := util.NewClock()
+		repo := task.NewMemoryRepository()
+		taskService := task.NewService(repo, idGen, clock)
 		promptService := chat.NewService(taskService)
 		handler := NewHandler(taskService, promptService)
 		router := NewRouter(handler)
@@ -279,7 +295,7 @@ func TestIntegration_Server(t *testing.T) {
 		updateBody, err := json.Marshal(updateInput)
 		require.NoError(t, err)
 
-		req, err := http.NewRequest(http.MethodPut, ts.URL+"/tasks/"+created.ID, bytes.NewReader(updateBody))
+		req, err := http.NewRequest(http.MethodPatch, ts.URL+"/tasks/"+created.ID, bytes.NewReader(updateBody))
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
 
@@ -302,8 +318,10 @@ func TestIntegration_Server(t *testing.T) {
 	})
 
 	t.Run("should delete created task", func(t *testing.T) {
-		repo := task.NewDefaultMemoryRepository()
-		service := task.NewService(repo)
+		idGen := idgen.NewSequential("TASK-", 1, 3)
+		clock := util.NewClock()
+		repo := task.NewMemoryRepository()
+		service := task.NewService(repo, idGen, clock)
 		promptService := chat.NewService(service)
 		handler := NewHandler(service, promptService)
 		router := NewRouter(handler)

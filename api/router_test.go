@@ -62,7 +62,7 @@ func TestRouter(t *testing.T) {
 		assert.Equal(t, http.StatusOK, rw.Code)
 	})
 
-	t.Run("PUT /tasks/{id}", func(t *testing.T) {
+	t.Run("PATCH /tasks/{id}", func(t *testing.T) {
 		mockCtrl := gomock.NewController(t)
 		defer mockCtrl.Finish()
 
@@ -70,7 +70,7 @@ func TestRouter(t *testing.T) {
 		router := NewRouter(handler)
 		rw := httptest.NewRecorder()
 
-		req, err := http.NewRequest(http.MethodPut, "/tasks/123", nil)
+		req, err := http.NewRequest(http.MethodPatch, "/tasks/123", nil)
 		require.NoError(t, err)
 
 		handler.EXPECT().Update(rw, req)

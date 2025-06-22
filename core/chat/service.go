@@ -32,14 +32,15 @@ func (s *service) ProcessPrompt(prompt string) (string, error) {
 	// 4. Return a human-readable response message
 
 	// For now, let's implement a very simple version that creates a task with the prompt as title
-	task, err := s.taskService.Create(
-		prompt, // Use prompt as the title
-		"",     // Empty description
-		nil,    // No priority
-		nil,    // No due date
-	)
 
-	if err != nil {
+	task := &task.Task{
+		Title:       prompt,
+		Description: "",
+		Priority:    nil,
+		DueDate:     nil,
+	}
+
+	if err := s.taskService.Create(task); err != nil {
 		return "", err
 	}
 

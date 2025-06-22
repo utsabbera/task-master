@@ -5,7 +5,9 @@ import (
 
 	"github.com/utsabbera/task-master/core/chat"
 	"github.com/utsabbera/task-master/core/task"
+	"github.com/utsabbera/task-master/pkg/idgen"
 	"github.com/utsabbera/task-master/pkg/middleware"
+	"github.com/utsabbera/task-master/pkg/util"
 )
 
 // ServerConfig holds the configuration for the API server.
@@ -20,8 +22,10 @@ func NewServer(cfg ServerConfig) *http.Server {
 		addr = ":8080"
 	}
 
-	repo := task.NewDefaultMemoryRepository()
-	taskService := task.NewService(repo)
+	repo := task.NewMemoryRepository()
+	idGen := idgen.NewSequential("TASK-", 1, 6)
+	clock := util.NewClock()
+	taskService := task.NewService(repo, idGen, clock)
 	promptService := chat.NewService(taskService)
 	handler := NewHandler(taskService, promptService)
 

@@ -2,107 +2,125 @@ package task
 
 import (
 	"fmt"
-	"time"
+
+	"github.com/utsabbera/task-master/pkg/idgen"
+	"github.com/utsabbera/task-master/pkg/util"
 )
 
 //go:generate mockgen -destination=service_mock.go -package=task . Service
 
 // Service defines the interface for task management operations
 type Service interface {
-	// Create adds a new task with the specified title, description, priority, and optional due date
-	Create(title, description string, priority *Priority, dueDate *time.Time) (*Task, error)
+	// Create adds a new task with the specified fields.
+	// The caller must set Title, Description, Priority, DueDate, and Status.
+	// The method mutates the provided *Task and returns an error if creation fails.
+	Create(task *Task) error
 
 	// Get retrieves a task by its ID
+	// Returns an error if the task cannot be found
 	Get(id string) (*Task, error)
 
-	// List returns all tasks stored in the repository
+	// List retrieves all tasks from the repository
 	List() ([]*Task, error)
 
-	// Update modifies an existing task in the repository
-	Update(task *Task) error
+	// Update updates an existing task with the provided fields in the update parameter.
+	// Only non-zero fields in the update parameter will overwrite the corresponding fields in the existing task.
+	// Returns an error if the update parameter is nil, the task cannot be found, or the update operation fails.
+	Update(id string, patch *Task) (*Task, error)
 
 	// Delete removes a task from the repository by its ID
+	// Returns an error if the task cannot be found
 	Delete(id string) error
 }
 
 type service struct {
-	repo Repository
+	repo        Repository
+	clock       util.Clock
+	idGenerator idgen.Generator
 }
 
-// NewService creates a new task service with the provided repository
-func NewService(repo Repository) Service {
+// NewService creates a new instance of Service with the provided repository, ID generator, and clock.
+func NewService(repo Repository, idGenerator idgen.Generator, time util.Clock) Service {
 	return &service{
-		repo: repo,
+		repo:        repo,
+		clock:       time,
+		idGenerator: idGenerator,
 	}
 }
 
-// Create creates a new task with the provided details
-// Returns an error if the title is empty or if there's an issue with the repository
-func (s *service) Create(title, description string, priority *Priority, dueDate *time.Time) (*Task, error) {
-	if title == "" {
-		return nil, fmt.Errorf("title cannot be empty")
+func (s *service) Create(task *Task) error {
+	if task.Status == "" {
+		task.Status = StatusNotStarted
 	}
 
-	task := NewTask(title, description, priority, dueDate)
+	task.ID = s.idGenerator.Next()
+	now := s.clock.Now()
+	task.UpdatedAt = now
+	task.CreatedAt = now
 
 	err := s.repo.Create(task)
 	if err != nil {
-		return nil, fmt.Errorf("creating task: %w", err)
-	}
-
-	return task, nil
-}
-
-// Get retrieves a task by its ID
-// Returns an error if the ID is empty or if the task cannot be found
-func (s *service) Get(id string) (*Task, error) {
-	if id == "" {
-		return nil, fmt.Errorf("task ID cannot be empty")
-	}
-
-	task, err := s.repo.Get(id)
-	if err != nil {
-		return nil, fmt.Errorf("finding task: %w", err)
-	}
-
-	return task, nil
-}
-
-// List retrieves all tasks from the repository
-func (s *service) List() ([]*Task, error) {
-	tasks, err := s.repo.List()
-	if err != nil {
-		return nil, fmt.Errorf("retrieving tasks: %w", err)
-	}
-
-	return tasks, nil
-}
-
-// Update updates an existing task in the repository
-// Returns ErrInvalidTask if the task is nil
-func (s *service) Update(task *Task) error {
-	if task == nil {
-		return ErrInvalidTask
-	}
-
-	err := s.repo.Update(task)
-	if err != nil {
-		return fmt.Errorf("updating task: %w", err)
+		return fmt.Errorf("error creating task: %w", err)
 	}
 
 	return nil
 }
 
-// Delete removes a task from the repository by its ID
-// Returns an error if the ID is empty or if the task cannot be found
-func (s *service) Delete(id string) error {
-	if id == "" {
-		return fmt.Errorf("task ID cannot be empty")
+func (s *service) Get(id string) (*Task, error) {
+	task, err := s.repo.Get(id)
+	if err != nil {
+		return nil, fmt.Errorf("error finding task: %w", err)
 	}
 
+	return task, nil
+}
+
+func (s *service) List() ([]*Task, error) {
+	tasks, err := s.repo.List()
+	if err != nil {
+		return nil, fmt.Errorf("error listing tasks: %w", err)
+	}
+
+	return tasks, nil
+}
+
+func (s *service) Update(id string, patch *Task) (*Task, error) {
+	task, err := s.repo.Get(id)
+	if err != nil {
+		return nil, fmt.Errorf("error finding task: %w", err)
+	}
+
+	s.update(task, patch)
+
+	err = s.repo.Update(task)
+	if err != nil {
+		return nil, fmt.Errorf("error updating task: %w", err)
+	}
+
+	return task, nil
+}
+
+func (s *service) update(task *Task, patch *Task) {
+	if patch.Title != "" {
+		task.Title = patch.Title
+	}
+	if patch.Description != "" {
+		task.Description = patch.Description
+	}
+	if patch.Priority != nil {
+		task.Priority = patch.Priority
+	}
+	if patch.DueDate != nil {
+		task.DueDate = patch.DueDate
+	}
+
+	task.UpdatedAt = s.clock.Now()
+}
+
+func (s *service) Delete(id string) error {
 	err := s.repo.Delete(id)
 	if err != nil {
-		return fmt.Errorf("deleting task: %w", err)
+		return fmt.Errorf("error deleting task: %w", err)
 	}
 
 	return nil

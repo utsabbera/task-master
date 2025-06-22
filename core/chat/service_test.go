@@ -17,12 +17,17 @@ func TestService_ProcessPrompt(t *testing.T) {
 		mockTaskService := task.NewMockService(ctrl)
 		promptService := NewService(mockTaskService)
 
-		mockTaskService.EXPECT().
-			Create("Create a new task", "", nil, nil).
-			Return(&task.Task{
-				ID:    "TASK-123",
-				Title: "Create a new task",
-			}, nil)
+		expectedTask := &task.Task{
+			Title:       "Create a new task",
+			Description: "",
+			Priority:    nil,
+			DueDate:     nil,
+		}
+
+		mockTaskService.EXPECT().Create(expectedTask).DoAndReturn(func(t *task.Task) error {
+			t.ID = "TASK-123"
+			return nil
+		})
 
 		result, err := promptService.ProcessPrompt("Create a new task")
 
@@ -37,9 +42,14 @@ func TestService_ProcessPrompt(t *testing.T) {
 		mockTaskService := task.NewMockService(ctrl)
 		promptService := NewService(mockTaskService)
 
-		mockTaskService.EXPECT().
-			Create("Invalid task", "", nil, nil).
-			Return(nil, errors.New("task creation failed"))
+		task := &task.Task{
+			Title:       "Invalid task",
+			Description: "",
+			Priority:    nil,
+			DueDate:     nil,
+		}
+
+		mockTaskService.EXPECT().Create(task).Return(errors.New("task creation failed"))
 
 		result, err := promptService.ProcessPrompt("Invalid task")
 

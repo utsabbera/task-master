@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/utsabbera/task-master/pkg/idgen"
 	"github.com/utsabbera/task-master/pkg/match"
+	"github.com/utsabbera/task-master/pkg/util"
 	"go.uber.org/mock/gomock"
 )
 
@@ -15,26 +17,38 @@ func TestService_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
 		priority := PriorityMedium
 		due := time.Now().Add(24 * time.Hour).Truncate(time.Second)
 
-		mockRepo.EXPECT().
-			Create(match.PtrTo(&Task{
-				Title:       "Test Task",
-				Description: "Description",
-				Status:      StatusNotStarted,
-				Priority:    &priority,
-				DueDate:     &due,
-			})).
-			DoAndReturn(func(task *Task) error {
-				task.ID = "TEST-ID"
-				return nil
-			})
+		mockIdGen.EXPECT().Next().Return("TEST-ID")
+		createTime := time.Now().Truncate(time.Second)
+		clock.EXPECT().Now().Return(createTime)
 
-		task, err := service.Create("Test Task", "Description", &priority, &due)
+		task := &Task{
+			Title:       "Test Task",
+			Description: "Description",
+			Status:      StatusInProgress,
+			Priority:    &priority,
+			DueDate:     &due,
+		}
+
+		mockRepo.EXPECT().Create(match.PtrTo(&Task{
+			ID:          "TEST-ID",
+			Title:       "Test Task",
+			Description: "Description",
+			Status:      StatusInProgress,
+			Priority:    &priority,
+			DueDate:     &due,
+			CreatedAt:   createTime,
+			UpdatedAt:   createTime,
+		})).Return(nil)
+
+		err := service.Create(task)
 
 		assert.NoError(t, err)
 		assert.Equal(t, "TEST-ID", task.ID)
@@ -48,25 +62,36 @@ func TestService_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
 		due := time.Now().Add(24 * time.Hour).Truncate(time.Second)
 
-		mockRepo.EXPECT().
-			Create(match.PtrTo(&Task{
-				Title:       "No Priority",
-				Description: "Description",
-				Status:      StatusNotStarted,
-				Priority:    nil,
-				DueDate:     &due,
-			})).
-			DoAndReturn(func(task *Task) error {
-				task.ID = "TEST-ID"
-				return nil
-			})
+		mockIdGen.EXPECT().Next().Return("TEST-ID")
+		createTime := time.Now().Truncate(time.Second)
+		clock.EXPECT().Now().Return(createTime)
 
-		task, err := service.Create("No Priority", "Description", nil, &due)
+		task := &Task{
+			Title:       "No Priority",
+			Description: "Description",
+			Status:      StatusInProgress,
+			DueDate:     &due,
+		}
+
+		mockRepo.EXPECT().Create(match.PtrTo(&Task{
+			ID:          "TEST-ID",
+			Title:       "No Priority",
+			Description: "Description",
+			Status:      StatusInProgress,
+			Priority:    nil,
+			DueDate:     &due,
+			CreatedAt:   createTime,
+			UpdatedAt:   createTime,
+		})).Return(nil)
+
+		err := service.Create(task)
 
 		assert.NoError(t, err)
 		assert.Equal(t, "TEST-ID", task.ID)
@@ -77,60 +102,110 @@ func TestService_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
 		priority := PriorityMedium
+		createTime := time.Now().Truncate(time.Second)
+		clock.EXPECT().Now().Return(createTime)
+		mockIdGen.EXPECT().Next().Return("TEST-ID")
 
-		mockRepo.EXPECT().
-			Create(match.PtrTo(&Task{
-				Title:       "No DueDate",
-				Description: "Description",
-				Status:      StatusNotStarted,
-				Priority:    &priority,
-				DueDate:     nil,
-			})).
-			DoAndReturn(func(task *Task) error {
-				task.ID = "TEST-ID"
-				return nil
-			})
+		task := &Task{
+			Title:       "No DueDate",
+			Description: "Description",
+			Status:      StatusInProgress,
+			Priority:    &priority,
+		}
 
-		task, err := service.Create("No DueDate", "Description", &priority, nil)
+		mockRepo.EXPECT().Create(match.PtrTo(&Task{
+			ID:          "TEST-ID",
+			Title:       "No DueDate",
+			Description: "Description",
+			Status:      StatusInProgress,
+			Priority:    &priority,
+			DueDate:     nil,
+			CreatedAt:   createTime,
+			UpdatedAt:   createTime,
+		})).Return(nil)
+
+		err := service.Create(task)
 
 		assert.NoError(t, err)
 		assert.Equal(t, "TEST-ID", task.ID)
 		assert.Nil(t, task.DueDate)
 	})
 
-	t.Run("should return error for empty title", func(t *testing.T) {
+	t.Run("should set status to not started when not passed", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
-		task, err := service.Create("", "Description", nil, nil)
+		mockIdGen.EXPECT().Next().Return("TEST-ID")
+		createTime := time.Now().Truncate(time.Second)
+		clock.EXPECT().Now().Return(createTime)
 
-		assert.Error(t, err)
-		assert.Nil(t, task)
-		assert.Contains(t, err.Error(), "title cannot be empty")
+		task := &Task{
+			Title:       "Task Without Status",
+			Description: "Description",
+			Priority:    nil,
+			DueDate:     nil,
+		}
+
+		mockRepo.EXPECT().Create(match.PtrTo(&Task{
+			ID:          "TEST-ID",
+			Title:       "Task Without Status",
+			Description: "Description",
+			Status:      StatusNotStarted,
+			Priority:    nil,
+			DueDate:     nil,
+			CreatedAt:   createTime,
+			UpdatedAt:   createTime,
+		})).Return(nil)
+
+		err := service.Create(task)
+
+		assert.NoError(t, err)
+		assert.Equal(t, StatusNotStarted, task.Status)
 	})
 
 	t.Run("should return error when repository create fails", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
-		mockRepo.EXPECT().
-			Create(gomock.Any()).
-			Return(errors.New("repository error"))
+		createTime := time.Now().Truncate(time.Second)
+		clock.EXPECT().Now().Return(createTime)
+		mockIdGen.EXPECT().Next().Return("TEST-ID")
 
-		task, err := service.Create("Test Task", "Description", nil, nil)
+		task := &Task{
+			Title:       "Test Task",
+			Description: "Description",
+		}
+
+		mockRepo.EXPECT().Create(match.PtrTo(&Task{
+			ID:          "TEST-ID",
+			Title:       "Test Task",
+			Description: "Description",
+			Status:      StatusNotStarted,
+			Priority:    nil,
+			DueDate:     nil,
+			CreatedAt:   createTime,
+			UpdatedAt:   createTime,
+		})).Return(errors.New("repository error"))
+
+		err := service.Create(task)
 
 		assert.Error(t, err)
-		assert.Nil(t, task)
 		assert.Contains(t, err.Error(), "repository error")
 	})
 }
@@ -140,8 +215,10 @@ func TestService_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
 		mockRepo.EXPECT().
 			Get("TEST-ID").
@@ -158,8 +235,10 @@ func TestService_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
 		mockRepo.EXPECT().
 			Get("UNKNOWN").
@@ -178,8 +257,10 @@ func TestService_List(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
 		tasks := []*Task{
 			{ID: "1", Title: "Task 1"},
@@ -201,8 +282,10 @@ func TestService_List(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
 		mockRepo.EXPECT().
 			List().
@@ -218,8 +301,10 @@ func TestService_List(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
 		mockRepo.EXPECT().
 			List().
@@ -234,40 +319,100 @@ func TestService_List(t *testing.T) {
 }
 
 func TestService_Update(t *testing.T) {
-	t.Run("should update task", func(t *testing.T) {
+	t.Run("should update task fields", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
-		task := &Task{ID: "TEST-ID", Title: "Updated Task"}
+		id := "TEST-ID"
+		existing := &Task{
+			ID:          id,
+			Title:       "Old Title",
+			Description: "Old Desc",
+			Status:      StatusNotStarted,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		}
+		patch := &Task{
+			Title:       "New Title",
+			Description: "New Desc",
+		}
 
-		mockRepo.EXPECT().
-			Update(task).
-			Return(nil)
+		updateTime := existing.UpdatedAt.Add(1 * time.Minute)
 
-		err := service.Update(task)
+		updated := &Task{
+			ID:          id,
+			Title:       "New Title",
+			Description: "New Desc",
+			Status:      existing.Status,
+			CreatedAt:   existing.CreatedAt,
+			UpdatedAt:   updateTime,
+		}
+
+		mockRepo.EXPECT().Get(id).Return(existing, nil)
+		mockRepo.EXPECT().Update(match.PtrTo(updated)).Return(nil)
+		clock.EXPECT().Now().Return(updateTime)
+
+		result, err := service.Update(id, patch)
 
 		assert.NoError(t, err)
+		assert.Equal(t, "New Title", result.Title)
+		assert.Equal(t, "New Desc", result.Description)
 	})
 
-	t.Run("should return error when update fails", func(t *testing.T) {
+	t.Run("should return error if repo.Get fails", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
-		task := &Task{ID: "TEST-ID", Title: "Updated Task"}
+		mockRepo.EXPECT().Get("BAD-ID").Return(nil, errors.New("not found"))
 
-		mockRepo.EXPECT().
-			Update(task).
-			Return(errors.New("update error"))
-
-		err := service.Update(task)
+		patch := &Task{Title: "Patch"}
+		result, err := service.Update("BAD-ID", patch)
 
 		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "not found")
+	})
+
+	t.Run("should return error if repo.Update fails", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		clock := util.NewMockClock(ctrl)
+		mockRepo := NewMockRepository(ctrl)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
+
+		id := "TEST-ID"
+		existing := &Task{ID: id, Title: "Old Title", Status: StatusNotStarted}
+		patch := &Task{Title: "New Title"}
+		updateTime := existing.UpdatedAt.Add(1 * time.Minute)
+
+		updated := &Task{
+			ID:        id,
+			Title:     "New Title",
+			Status:    existing.Status,
+			CreatedAt: existing.CreatedAt,
+			UpdatedAt: updateTime,
+		}
+
+		mockRepo.EXPECT().Get(id).Return(existing, nil)
+		mockRepo.EXPECT().Update(updated).Return(errors.New("update error"))
+		clock.EXPECT().Now().Return(updateTime)
+
+		result, err := service.Update(id, patch)
+
+		assert.Error(t, err)
+		assert.Nil(t, result)
 		assert.Contains(t, err.Error(), "update error")
 	})
 }
@@ -277,8 +422,10 @@ func TestService_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
 		mockRepo.EXPECT().
 			Delete("TEST-ID").
@@ -293,8 +440,10 @@ func TestService_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
+		clock := util.NewMockClock(ctrl)
 		mockRepo := NewMockRepository(ctrl)
-		service := NewService(mockRepo)
+		mockIdGen := idgen.NewMockGenerator(ctrl)
+		service := NewService(mockRepo, mockIdGen, clock)
 
 		mockRepo.EXPECT().
 			Delete("TEST-ID").

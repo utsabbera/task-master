@@ -21,6 +21,7 @@ type Task struct {
 type TaskInput struct {
 	Title       string         `json:"title"`
 	Description string         `json:"description"`
+	Status      task.Status    `json:"status"`
 	Priority    *task.Priority `json:"priority"`
 	DueDate     *time.Time     `json:"dueDate"`
 }

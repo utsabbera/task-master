@@ -13,7 +13,7 @@ func NewTaskRouter(handler Handler, middlewares ...middleware.Middleware) http.H
 	router.HandleFunc("POST /tasks", handler.Create)
 	router.HandleFunc("GET /tasks", handler.List)
 	router.HandleFunc("GET /tasks/{id}", handler.Get)
-	router.HandleFunc("PUT /tasks/{id}", handler.Update)
+	router.HandleFunc("PATCH /tasks/{id}", handler.Update)
 	router.HandleFunc("DELETE /tasks/{id}", handler.Delete)
 	router.HandleFunc("POST /prompts", handler.ProcessPrompt)
 
