@@ -21,9 +21,9 @@ definitions:
       id:
         type: string
       priority:
-        $ref: "#/definitions/task.Priority"
+        $ref: '#/definitions/task.Priority'
       status:
-        $ref: "#/definitions/task.Status"
+        $ref: '#/definitions/task.Status'
       title:
         type: string
       updatedAt:
@@ -36,30 +36,32 @@ definitions:
       dueDate:
         type: string
       priority:
-        $ref: "#/definitions/task.Priority"
+        $ref: '#/definitions/task.Priority'
+      status:
+        $ref: '#/definitions/task.Status'
       title:
         type: string
     type: object
   task.Priority:
     enum:
-      - 1
-      - 2
-      - 3
+    - 1
+    - 2
+    - 3
     type: integer
     x-enum-varnames:
-      - PriorityLow
-      - PriorityMedium
-      - PriorityHigh
+    - PriorityLow
+    - PriorityMedium
+    - PriorityHigh
   task.Status:
     enum:
-      - NOT_STARTED
-      - IN_PROGRESS
-      - COMPLETED
+    - NOT_STARTED
+    - IN_PROGRESS
+    - COMPLETED
     type: string
     x-enum-varnames:
-      - StatusNotStarted
-      - StatusInProgress
-      - StatusCompleted
+    - StatusNotStarted
+    - StatusInProgress
+    - StatusCompleted
 host: localhost:8080
 info:
   contact: {}
@@ -70,70 +72,70 @@ paths:
   /prompts:
     post:
       consumes:
-        - application/json
+      - application/json
       description: Process a natural language prompt for task management
       parameters:
-        - description: Prompt input
-          in: body
-          name: prompt
-          required: true
-          schema:
-            $ref: "#/definitions/api.PromptInput"
+      - description: Prompt input
+        in: body
+        name: prompt
+        required: true
+        schema:
+          $ref: '#/definitions/api.PromptInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/api.PromptResponse"
+            $ref: '#/definitions/api.PromptResponse'
       summary: Process Task Prompt
       tags:
-        - prompts
+      - prompts
   /tasks:
     get:
       description: List all tasks
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
             items:
-              $ref: "#/definitions/api.Task"
+              $ref: '#/definitions/api.Task'
             type: array
       summary: List Tasks
       tags:
-        - tasks
+      - tasks
     post:
       consumes:
-        - application/json
+      - application/json
       description: Create a new task
       parameters:
-        - description: Task input
-          in: body
-          name: task
-          required: true
-          schema:
-            $ref: "#/definitions/api.TaskInput"
+      - description: Task input
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/api.TaskInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: "#/definitions/api.Task"
+            $ref: '#/definitions/api.Task'
       summary: Create Task
       tags:
-        - tasks
+      - tasks
   /tasks/{id}:
     delete:
       description: Delete a task by ID
       parameters:
-        - description: Task ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
       responses:
         "204":
           description: Task deleted
@@ -145,57 +147,57 @@ paths:
             type: string
       summary: Delete Task
       tags:
-        - tasks
+      - tasks
     get:
       description: Get a task by ID
       parameters:
-        - description: Task ID
-          in: path
-          name: id
-          required: true
-          type: string
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/api.Task"
+            $ref: '#/definitions/api.Task'
         "404":
           description: Task not found
           schema:
             type: string
       summary: Get Task
       tags:
-        - tasks
-    put:
+      - tasks
+    patch:
       consumes:
-        - application/json
-      description: Update a task by ID
+      - application/json
+      description: Partially update a task by ID
       parameters:
-        - description: Task ID
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Task input
-          in: body
-          name: task
-          required: true
-          schema:
-            $ref: "#/definitions/api.TaskInput"
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Task fields to update
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/api.TaskInput'
       produces:
-        - application/json
+      - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: "#/definitions/api.Task"
+            $ref: '#/definitions/api.Task'
         "404":
           description: Task not found
           schema:
             type: string
       summary: Update Task
       tags:
-        - tasks
+      - tasks
 swagger: "2.0"
