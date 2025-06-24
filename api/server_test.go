@@ -11,8 +11,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/utsabbera/task-master/core/chat"
+	coreassistant "github.com/utsabbera/task-master/core/assistant"
 	"github.com/utsabbera/task-master/core/task"
+	"github.com/utsabbera/task-master/pkg/assistant"
 	"github.com/utsabbera/task-master/pkg/idgen"
 	"github.com/utsabbera/task-master/pkg/util"
 )
@@ -36,13 +37,18 @@ func TestNewServer(t *testing.T) {
 }
 
 func TestIntegration_Server(t *testing.T) {
+	testAssistantServer := assistant.NewTestServer(t)
+	defer testAssistantServer.Close()
+
 	t.Run("should create task with title and description", func(t *testing.T) {
 		idGen := idgen.NewSequential("TASK-", 1, 3)
 		clock := util.NewClock()
 		repo := task.NewMemoryRepository()
-		service := task.NewService(repo, idGen, clock)
-		promptService := chat.NewService(service)
-		handler := NewHandler(service, promptService)
+		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
+		assistantClient := assistant.NewClient(assistantConfig)
+		taskService := task.NewService(repo, idGen, clock)
+		chatService := coreassistant.NewService(taskService, assistantClient)
+		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -77,9 +83,11 @@ func TestIntegration_Server(t *testing.T) {
 		idGen := idgen.NewSequential("TASK-", 1, 3)
 		clock := util.NewClock()
 		repo := task.NewMemoryRepository()
-		service := task.NewService(repo, idGen, clock)
-		promptService := chat.NewService(service)
-		handler := NewHandler(service, promptService)
+		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
+		assistantClient := assistant.NewClient(assistantConfig)
+		taskService := task.NewService(repo, idGen, clock)
+		chatService := coreassistant.NewService(taskService, assistantClient)
+		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -116,9 +124,11 @@ func TestIntegration_Server(t *testing.T) {
 		idGen := idgen.NewSequential("TASK-", 1, 3)
 		clock := util.NewClock()
 		repo := task.NewMemoryRepository()
-		service := task.NewService(repo, idGen, clock)
-		promptService := chat.NewService(service)
-		handler := NewHandler(service, promptService)
+		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
+		assistantClient := assistant.NewClient(assistantConfig)
+		taskService := task.NewService(repo, idGen, clock)
+		chatService := coreassistant.NewService(taskService, assistantClient)
+		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -155,9 +165,11 @@ func TestIntegration_Server(t *testing.T) {
 		idGen := idgen.NewSequential("TASK-", 1, 3)
 		clock := util.NewClock()
 		repo := task.NewMemoryRepository()
-		service := task.NewService(repo, idGen, clock)
-		promptService := chat.NewService(service)
-		handler := NewHandler(service, promptService)
+		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
+		assistantClient := assistant.NewClient(assistantConfig)
+		taskService := task.NewService(repo, idGen, clock)
+		chatService := coreassistant.NewService(taskService, assistantClient)
+		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -204,9 +216,11 @@ func TestIntegration_Server(t *testing.T) {
 		idGen := idgen.NewSequential("TASK-", 1, 3)
 		clock := util.NewClock()
 		repo := task.NewMemoryRepository()
-		service := task.NewService(repo, idGen, clock)
-		promptService := chat.NewService(service)
-		handler := NewHandler(service, promptService)
+		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
+		assistantClient := assistant.NewClient(assistantConfig)
+		taskService := task.NewService(repo, idGen, clock)
+		chatService := coreassistant.NewService(taskService, assistantClient)
+		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -259,9 +273,11 @@ func TestIntegration_Server(t *testing.T) {
 		idGen := idgen.NewSequential("TASK-", 1, 3)
 		clock := util.NewClock()
 		repo := task.NewMemoryRepository()
+		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
+		assistantClient := assistant.NewClient(assistantConfig)
 		taskService := task.NewService(repo, idGen, clock)
-		promptService := chat.NewService(taskService)
-		handler := NewHandler(taskService, promptService)
+		chatService := coreassistant.NewService(taskService, assistantClient)
+		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -321,9 +337,11 @@ func TestIntegration_Server(t *testing.T) {
 		idGen := idgen.NewSequential("TASK-", 1, 3)
 		clock := util.NewClock()
 		repo := task.NewMemoryRepository()
-		service := task.NewService(repo, idGen, clock)
-		promptService := chat.NewService(service)
-		handler := NewHandler(service, promptService)
+		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
+		assistantClient := assistant.NewClient(assistantConfig)
+		taskService := task.NewService(repo, idGen, clock)
+		chatService := coreassistant.NewService(taskService, assistantClient)
+		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
 		ts := httptest.NewServer(router)
@@ -364,5 +382,37 @@ func TestIntegration_Server(t *testing.T) {
 		require.NoError(t, getResp.Body.Close())
 	})
 
-	// TODO: Add tests for prompt processing
+	t.Run("should process chat message and return response", func(t *testing.T) {
+		idGen := idgen.NewSequential("TASK-", 1, 3)
+		clock := util.NewClock()
+		repo := task.NewMemoryRepository()
+		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
+		assistantClient := assistant.NewClient(assistantConfig)
+		taskService := task.NewService(repo, idGen, clock)
+		chatService := coreassistant.NewService(taskService, assistantClient)
+		handler := NewHandler(taskService, chatService)
+		router := NewRouter(handler)
+
+		ts := httptest.NewServer(router)
+		defer ts.Close()
+
+		message := "Create a task titled 'Buy milk' with description 'Get from store'"
+		body, err := json.Marshal(ChatInput{Text: message})
+		require.NoError(t, err)
+
+		resp, err := http.Post(ts.URL+"/chat", "application/json", bytes.NewReader(body))
+		require.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		respBody, err := io.ReadAll(resp.Body)
+		require.NoError(t, err)
+		require.NoError(t, resp.Body.Close())
+
+		var result map[string]any
+		err = json.Unmarshal(respBody, &result)
+		require.NoError(t, err)
+		response, ok := result["response"].(string)
+		assert.True(t, ok)
+		assert.Contains(t, response, "Task created")
+	})
 }

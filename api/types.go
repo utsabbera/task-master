@@ -26,12 +26,12 @@ type TaskInput struct {
 	DueDate     *time.Time     `json:"dueDate"`
 }
 
-// PromptInput represents a natural language prompt for task management
-type PromptInput struct {
+// ChatInput represents a natural language message for task management.
+type ChatInput struct {
 	Text string `json:"text"`
 }
 
-// PromptResponse represents the response to a natural language prompt
-type PromptResponse struct {
+// ChatResponse represents the response to a natural language message.
+type ChatResponse struct {
 	Response string `json:"response"`
 }

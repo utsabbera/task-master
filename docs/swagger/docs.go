@@ -15,9 +15,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/prompts": {
+        "/chat": {
             "post": {
-                "description": "Process a natural language prompt for task management",
+                "description": "Chat in natural language for task management",
                 "consumes": [
                     "application/json"
                 ],
@@ -25,17 +25,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "prompts"
+                    "chat"
                 ],
-                "summary": "Process Task Prompt",
+                "summary": "Chat",
                 "parameters": [
                     {
-                        "description": "Prompt input",
-                        "name": "prompt",
+                        "description": "Chat input",
+                        "name": "chat",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.PromptInput"
+                            "$ref": "#/definitions/api.ChatInput"
                         }
                     }
                 ],
@@ -43,7 +43,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/api.PromptResponse"
+                            "$ref": "#/definitions/api.ChatResponse"
                         }
                     }
                 }
@@ -216,7 +216,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "api.PromptInput": {
+        "api.ChatInput": {
             "type": "object",
             "properties": {
                 "text": {
@@ -224,7 +224,7 @@ const docTemplate = `{
                 }
             }
         },
-        "api.PromptResponse": {
+        "api.ChatResponse": {
             "type": "object",
             "properties": {
                 "response": {
@@ -282,11 +282,11 @@ const docTemplate = `{
             }
         },
         "task.Priority": {
-            "type": "integer",
+            "type": "string",
             "enum": [
-                1,
-                2,
-                3
+                "LOW",
+                "MEDIUM",
+                "HIGH"
             ],
             "x-enum-varnames": [
                 "PriorityLow",

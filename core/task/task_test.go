@@ -48,9 +48,9 @@ func TestNewTask(t *testing.T) {
 
 func TestPriority(t *testing.T) {
 	t.Run("should have correct priority values", func(t *testing.T) {
-		assert.Equal(t, Priority(1), PriorityLow)
-		assert.Equal(t, Priority(2), PriorityMedium)
-		assert.Equal(t, Priority(3), PriorityHigh)
+		assert.Equal(t, Priority("LOW"), PriorityLow)
+		assert.Equal(t, Priority("MEDIUM"), PriorityMedium)
+		assert.Equal(t, Priority("HIGH"), PriorityHigh)
 	})
 }
 

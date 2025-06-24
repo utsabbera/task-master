@@ -5,6 +5,7 @@ import (
 
 	"github.com/utsabbera/task-master/api"
 	_ "github.com/utsabbera/task-master/docs/swagger" // swaggo generated docs
+	"github.com/utsabbera/task-master/pkg/assistant"
 )
 
 // @title Task Master
@@ -16,6 +17,12 @@ import (
 func main() {
 	cfg := api.ServerConfig{
 		Addr: ":8080",
+		Assistant: assistant.Config{
+			BaseURL:        "http://localhost:11434/v1",
+			Model:          "llama3.2",
+			AppName:        "Task Master",
+			AppDescription: "AI powered application for managing tasks",
+		},
 	}
 
 	server := api.NewServer(cfg)

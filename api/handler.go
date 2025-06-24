@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/utsabbera/task-master/core/chat"
+	"github.com/utsabbera/task-master/core/assistant"
 
 	taskcore "github.com/utsabbera/task-master/core/task"
 )
@@ -29,20 +29,20 @@ type Handler interface {
 	// Delete deletes a task by its ID.
 	Delete(w http.ResponseWriter, r *http.Request)
 
-	// ProcessPrompt handles natural language prompts for task management.
-	ProcessPrompt(w http.ResponseWriter, r *http.Request)
+	// Chat handles natural language messages for task management.
+	Chat(w http.ResponseWriter, r *http.Request)
 }
 
 type handler struct {
-	taskService   taskcore.Service
-	promptService chat.Service
+	task      taskcore.Service
+	assistant assistant.Service
 }
 
 // NewHandler returns a new instance of Handler for task operations.
-func NewHandler(taskService taskcore.Service, promptService chat.Service) Handler {
+func NewHandler(taskService taskcore.Service, assistantService assistant.Service) Handler {
 	return &handler{
-		taskService:   taskService,
-		promptService: promptService,
+		task:      taskService,
+		assistant: assistantService,
 	}
 }
 
@@ -81,7 +81,7 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 		DueDate:     input.DueDate,
 	}
 
-	err = h.taskService.Create(task)
+	err = h.task.Create(task)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -114,7 +114,7 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := h.taskService.Get(id)
+	task, err := h.task.Get(id)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -138,7 +138,7 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {array} Task
 // @Router /tasks [get]
 func (h *handler) List(w http.ResponseWriter, r *http.Request) {
-	tasks, err := h.taskService.List()
+	tasks, err := h.task.List()
 	if err != nil {
 		http.Error(w, "Failed to retrieve tasks", http.StatusInternalServerError)
 		return
@@ -192,7 +192,7 @@ func (h *handler) Update(w http.ResponseWriter, r *http.Request) {
 		DueDate:     input.DueDate,
 	}
 
-	task, err := h.taskService.Update(id, patch)
+	task, err := h.task.Update(id, patch)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -223,7 +223,7 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.taskService.Delete(id); err != nil {
+	if err := h.task.Delete(id); err != nil {
 		handleError(w, err)
 		return
 	}
@@ -231,28 +231,30 @@ func (h *handler) Delete(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// ProcessPrompt godoc
-// @Summary Process Task Prompt
-// @Description Process a natural language prompt for task management
-// @Tags prompts
+// Chat godoc
+// @Summary Chat
+// @Description Chat in natural language for task management
+// @Tags chat
 // @Accept json
 // @Produce json
-// @Param prompt body PromptInput true "Prompt input"
-// @Success 200 {object} PromptResponse
-// @Router /prompts [post]
-func (h *handler) ProcessPrompt(w http.ResponseWriter, r *http.Request) {
-	var input PromptInput
+// @Param chat body ChatInput true "Chat input"
+// @Success 200 {object} ChatResponse
+// @Router /chat [post]
+func (h *handler) Chat(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var input ChatInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	if input.Text == "" {
-		http.Error(w, "Prompt text cannot be empty", http.StatusBadRequest)
+		http.Error(w, "Chat text cannot be empty", http.StatusBadRequest)
 		return
 	}
 
-	response, err := h.promptService.ProcessPrompt(input.Text)
+	response, err := h.assistant.Chat(ctx, input.Text)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -261,7 +263,7 @@ func (h *handler) ProcessPrompt(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	resp := PromptResponse{
+	resp := ChatResponse{
 		Response: response,
 	}
 

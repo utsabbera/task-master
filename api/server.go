@@ -3,8 +3,9 @@ package api
 import (
 	"net/http"
 
-	"github.com/utsabbera/task-master/core/chat"
+	assistant1 "github.com/utsabbera/task-master/core/assistant"
 	"github.com/utsabbera/task-master/core/task"
+	"github.com/utsabbera/task-master/pkg/assistant"
 	"github.com/utsabbera/task-master/pkg/idgen"
 	"github.com/utsabbera/task-master/pkg/middleware"
 	"github.com/utsabbera/task-master/pkg/util"
@@ -12,7 +13,8 @@ import (
 
 // ServerConfig holds the configuration for the API server.
 type ServerConfig struct {
-	Addr string
+	Addr      string
+	Assistant assistant.Config
 }
 
 // NewServer returns a configured http.Server for the API.
@@ -26,8 +28,9 @@ func NewServer(cfg ServerConfig) *http.Server {
 	idGen := idgen.NewSequential("TASK-", 1, 6)
 	clock := util.NewClock()
 	taskService := task.NewService(repo, idGen, clock)
-	promptService := chat.NewService(taskService)
-	handler := NewHandler(taskService, promptService)
+	assistant := assistant.NewClient(cfg.Assistant)
+	assistantService := assistant1.NewService(taskService, assistant)
+	handler := NewHandler(taskService, assistantService)
 
 	middlewares := []middleware.Middleware{
 		middleware.Log(),

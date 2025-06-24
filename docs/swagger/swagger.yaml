@@ -1,11 +1,11 @@
 basePath: /
 definitions:
-  api.PromptInput:
+  api.ChatInput:
     properties:
       text:
         type: string
     type: object
-  api.PromptResponse:
+  api.ChatResponse:
     properties:
       response:
         type: string
@@ -44,10 +44,10 @@ definitions:
     type: object
   task.Priority:
     enum:
-    - 1
-    - 2
-    - 3
-    type: integer
+    - LOW
+    - MEDIUM
+    - HIGH
+    type: string
     x-enum-varnames:
     - PriorityLow
     - PriorityMedium
@@ -69,28 +69,28 @@ info:
   title: Task Master
   version: "1.0"
 paths:
-  /prompts:
+  /chat:
     post:
       consumes:
       - application/json
-      description: Process a natural language prompt for task management
+      description: Chat in natural language for task management
       parameters:
-      - description: Prompt input
+      - description: Chat input
         in: body
-        name: prompt
+        name: chat
         required: true
         schema:
-          $ref: '#/definitions/api.PromptInput'
+          $ref: '#/definitions/api.ChatInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/api.PromptResponse'
-      summary: Process Task Prompt
+            $ref: '#/definitions/api.ChatResponse'
+      summary: Chat
       tags:
-      - prompts
+      - chat
   /tasks:
     get:
       description: List all tasks

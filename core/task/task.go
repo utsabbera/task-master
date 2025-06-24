@@ -17,15 +17,15 @@ const (
 )
 
 // Priority defines the importance level of a task
-type Priority int
+type Priority string
 
 const (
 	// PriorityLow represents the lowest importance level
-	PriorityLow Priority = 1
+	PriorityLow Priority = "LOW"
 	// PriorityMedium represents the standard importance level
-	PriorityMedium Priority = 2
+	PriorityMedium Priority = "MEDIUM"
 	// PriorityHigh represents the highest importance level
-	PriorityHigh Priority = 3
+	PriorityHigh Priority = "HIGH"
 )
 
 // Task represents a single task in the task management system

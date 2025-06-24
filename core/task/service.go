@@ -12,7 +12,7 @@ import (
 // Service defines the interface for task management operations
 type Service interface {
 	// Create adds a new task with the specified fields.
-	// The caller must set Title, Description, Priority, DueDate, and Status.
+	// The caller must set Title, Description, Priority,DueDate, and Status.
 	// The method mutates the provided *Task and returns an error if creation fails.
 	Create(task *Task) error
 

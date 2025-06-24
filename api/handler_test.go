@@ -14,7 +14,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/utsabbera/task-master/core/chat"
+	"github.com/utsabbera/task-master/core/assistant"
 	"github.com/utsabbera/task-master/core/task"
 	"github.com/utsabbera/task-master/pkg/match"
 	"github.com/utsabbera/task-master/pkg/util"
@@ -25,8 +25,8 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		input := TaskInput{
 			Title:       "Test Task",
@@ -81,8 +81,8 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		req := httptest.NewRequest(http.MethodPost, "/tasks", bytes.NewReader([]byte("invalid json")))
 		req.Header.Set("Content-Type", "application/json")
@@ -97,8 +97,8 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		input := TaskInput{
 			Title:       "Test Task",
@@ -127,8 +127,8 @@ func TestHandler_Create(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		input := TaskInput{Description: "desc"}
 		inputBytes, err := json.Marshal(input)
@@ -149,8 +149,8 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		taskID := "task-123"
 		existingTask := &task.Task{
@@ -185,8 +185,8 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		req := httptest.NewRequest(http.MethodGet, "/tasks/", nil)
 		res := httptest.NewRecorder()
@@ -200,8 +200,8 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		taskID := "non-existent"
 		mockTaskService.EXPECT().Get(taskID).Return(nil, task.ErrTaskNotFound)
@@ -219,8 +219,8 @@ func TestHandler_Get(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		taskID := "task-err"
 		mockTaskService.EXPECT().Get(taskID).Return(nil, fmt.Errorf("unexpected error"))
@@ -240,8 +240,8 @@ func TestHandler_List(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		tasks := []*task.Task{
 			{
@@ -290,8 +290,8 @@ func TestHandler_List(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		mockTaskService.EXPECT().List().Return(nil, fmt.Errorf("database error"))
 
@@ -309,8 +309,8 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		taskID := "task-123"
 		input := TaskInput{
@@ -364,8 +364,8 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		input := TaskInput{
 			Title:       "Updated Task",
@@ -387,8 +387,8 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		taskID := "task-123"
 		req := httptest.NewRequest(http.MethodPatch, "/tasks/"+taskID, bytes.NewReader([]byte("invalid json")))
@@ -405,8 +405,8 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		taskID := "non-existent"
 		input := TaskInput{
@@ -435,8 +435,8 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		taskID := "task-123"
 		input := TaskInput{
@@ -465,8 +465,8 @@ func TestHandler_Update(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		taskID := "task-123"
 		input := TaskInput{
@@ -506,8 +506,8 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		taskID := "task-123"
 		mockTaskService.EXPECT().Delete(taskID).Return(nil)
@@ -525,8 +525,8 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		req := httptest.NewRequest(http.MethodDelete, "/tasks/", nil)
 		res := httptest.NewRecorder()
@@ -540,8 +540,8 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		taskID := "non-existent"
 		mockTaskService.EXPECT().Delete(taskID).Return(task.ErrTaskNotFound)
@@ -559,8 +559,8 @@ func TestHandler_Delete(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		taskID := "task-err"
 		mockTaskService.EXPECT().Delete(taskID).Return(fmt.Errorf("unexpected error"))
@@ -575,76 +575,80 @@ func TestHandler_Delete(t *testing.T) {
 	})
 }
 
-func TestHandler_ProcessPrompt(t *testing.T) {
-	t.Run("should process prompt successfully", func(t *testing.T) {
+func TestHandler_Chat(t *testing.T) {
+	t.Run("should process assistant successfully", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
-		input := PromptInput{
+		input := ChatInput{
 			Text: "Create a new task to finish the report",
 		}
-		mockPromptService.EXPECT().ProcessPrompt(input.Text).Return("Task created: TASK-123", nil)
 
 		body, err := json.Marshal(input)
 		require.NoError(t, err)
 
-		req := httptest.NewRequest(http.MethodPost, "/prompts", bytes.NewReader(body))
+		req := httptest.NewRequest(http.MethodPost, "/chat", bytes.NewReader(body))
 		w := httptest.NewRecorder()
-		handler.ProcessPrompt(w, req)
+
+		mockAssistantService.EXPECT().Chat(req.Context(), input.Text).Return("Task created: TASK-123", nil)
+
+		handler.Chat(w, req)
 
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var response PromptResponse
+		var response ChatResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 
 		assert.Contains(t, response.Response, "TASK-123")
 	})
 
-	t.Run("should handle empty prompt", func(t *testing.T) {
+	t.Run("should handle empty assistant", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
-		input := PromptInput{
+		input := ChatInput{
 			Text: "",
 		}
 		body, err := json.Marshal(input)
 		require.NoError(t, err)
 
-		req := httptest.NewRequest(http.MethodPost, "/prompts", bytes.NewReader(body))
+		req := httptest.NewRequest(http.MethodPost, "/chat", bytes.NewReader(body))
 		w := httptest.NewRecorder()
-		handler.ProcessPrompt(w, req)
+		handler.Chat(w, req)
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 		assert.Contains(t, w.Body.String(), "cannot be empty")
 	})
 
-	t.Run("should handle prompt service error", func(t *testing.T) {
+	t.Run("should handle assistant service error", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		mockTaskService := task.NewMockService(ctrl)
-		mockPromptService := chat.NewMockService(ctrl)
-		handler := NewHandler(mockTaskService, mockPromptService)
+		mockAssistantService := assistant.NewMockService(ctrl)
+		handler := NewHandler(mockTaskService, mockAssistantService)
 
-		input := PromptInput{
-			Text: "Invalid prompt",
+		input := ChatInput{
+			Text: "Invalid assistant",
 		}
-		mockPromptService.EXPECT().ProcessPrompt(input.Text).Return("", errors.New("failed to process prompt"))
 
 		body, err := json.Marshal(input)
 		require.NoError(t, err)
 
-		req := httptest.NewRequest(http.MethodPost, "/prompts", bytes.NewReader(body))
+		req := httptest.NewRequest(http.MethodPost, "/chat", bytes.NewReader(body))
 		w := httptest.NewRecorder()
-		handler.ProcessPrompt(w, req)
+
+		mockAssistantService.EXPECT().Chat(req.Context(), input.Text).Return("", errors.New("failed to process assistant"))
+
+		handler.Chat(w, req)
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
-		assert.Contains(t, w.Body.String(), "failed to process prompt")
+		assert.Contains(t, w.Body.String(), "failed to process assistant")
 	})
 }

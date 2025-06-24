@@ -44,8 +44,8 @@ type Client interface {
 	RegisterFunction(fn Function)
 	// RegisterFunctions registers multiple functions for use by the chat client.
 	RegisterFunctions(funcs ...Function)
-	// Chat sends a prompt to the chat client and returns the response.
-	Chat(ctx context.Context, prompt string) (string, error)
+	// Chat sends a message to the chat client and returns the response.
+	Chat(ctx context.Context, message string) (string, error)
 }
 
 type client struct {
@@ -129,8 +129,8 @@ Always confirm actions with the user, provide clear feedback, and handle errors 
 `, c.config.AppName, c.config.AppDescription)
 }
 
-func (c *client) Chat(ctx context.Context, prompt string) (string, error) {
-	c.params.Messages = append(c.params.Messages, openai.UserMessage(prompt))
+func (c *client) Chat(ctx context.Context, message string) (string, error) {
+	c.params.Messages = append(c.params.Messages, openai.UserMessage(message))
 	return c.process(ctx)
 }
 
