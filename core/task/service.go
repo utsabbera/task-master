@@ -113,6 +113,9 @@ func (s *service) update(task *Task, patch *Task) {
 	if patch.DueDate != nil {
 		task.DueDate = patch.DueDate
 	}
+	if patch.Status != "" {
+		task.Status = patch.Status
+	}
 
 	task.UpdatedAt = s.clock.Now()
 }

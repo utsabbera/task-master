@@ -19,8 +19,8 @@ import (
 //	})
 //	resp := fn.Call(ctx, `{"field": "value"}`)
 type Function struct {
-	def  openai.FunctionDefinitionParam
-	Func func(ctx context.Context, params string) (any, error)
+	def      FunctionDefinition
+	callback func(ctx context.Context, params string) (any, error)
 }
 
 // NewFunction creates a new Function with the given name, description, and implementation.
@@ -47,8 +47,8 @@ func NewFunction[P, R any](
 	fn func(context.Context, P) (R, error),
 ) Function {
 	return Function{
-		def: definition(name, description, fn),
-		Func: func(ctx context.Context, args string) (any, error) {
+		def: DefinitionOf(name, description, fn),
+		callback: func(ctx context.Context, args string) (any, error) {
 			var param P
 			if err := json.Unmarshal([]byte(args), &param); err != nil {
 				// TODO: Handle this error properly
@@ -60,29 +60,63 @@ func NewFunction[P, R any](
 	}
 }
 
-// definition generates an OpenAI function definition for the given function signature.
-func definition[P, R any](
+func (f Function) Definition() FunctionDefinition {
+	return f.def
+}
+
+// Call invokes the Function with the given arguments and returns a FunctionResponse.
+//
+// Example:
+//
+//	resp := fn.Call(ctx, `{"field": "value"}`)
+func (f Function) Call(ctx context.Context, args string) FunctionResponse {
+	result, err := f.callback(ctx, args)
+	if err != nil {
+		return Error(fmt.Errorf("function execution failed: %w", err))
+	}
+
+	return Data(result)
+}
+
+func toOpenAIFunctionDefinitionParam(def FunctionDefinition) openai.FunctionDefinitionParam {
+	required := make([]string, 0, len(def.Parameters.Required))
+
+	params := shared.FunctionParameters{
+		"type":       def.Parameters.Type,
+		"properties": def.Parameters.Properties,
+		"required":   append(required, def.Parameters.Required...), // TODO: Handle this properly
+	}
+
+	return openai.FunctionDefinitionParam{
+		Name:        def.Name,
+		Parameters:  params,
+		Description: openai.String(def.Description),
+	}
+}
+
+type FunctionDefinition struct {
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	Parameters  *jsonschema.Schema `json:"parameters"`
+}
+
+// DefinitionOf generates an function definition for the given function signature.
+func DefinitionOf[P, R any](
 	name, description string,
 	_ func(context.Context, P) (R, error),
-) openai.FunctionDefinitionParam {
+) FunctionDefinition {
 	reflector := jsonschema.Reflector{
 		AllowAdditionalProperties: false,
 		DoNotReference:            true,
 	}
 
 	var param P
-	schema := reflector.Reflect(param)
+	paramSchema := reflector.Reflect(param)
 
-	funcParams := shared.FunctionParameters{
-		"type":       schema.Type,
-		"properties": schema.Properties,
-		"required":   schema.Required,
-	}
-
-	return openai.FunctionDefinitionParam{
+	return FunctionDefinition{
 		Name:        name,
-		Parameters:  funcParams,
-		Description: openai.String(description),
+		Description: description,
+		Parameters:  paramSchema,
 	}
 }
 
@@ -102,18 +136,4 @@ func Error(err error) FunctionResponse {
 // Data creates a FunctionResponse with the given data.
 func Data(data any) FunctionResponse {
 	return FunctionResponse{Data: data}
-}
-
-// Call invokes the Function with the given arguments and returns a FunctionResponse.
-//
-// Example:
-//
-//	resp := fn.Call(ctx, `{"field": "value"}`)
-func (f Function) Call(ctx context.Context, args string) FunctionResponse {
-	result, err := f.Func(ctx, args)
-	if err != nil {
-		return Error(fmt.Errorf("function execution failed: %w", err))
-	}
-
-	return Data(result)
 }

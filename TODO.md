@@ -31,12 +31,13 @@
 
 ## Tech Enhancements:
 
-- [ ] Rename project
+- [ ] Add tests for the new util methods
+- [ ] Refine the system prompt and Allow custom instructions
+- [ ] Rename project: task-master -> taskmaster
 - [ ] Redefined make commands to accept arguments to specify path
 - [ ] Follow a common convension for response (error response / data response)
 - [ ] Publish the assistant package on go.dev
-- [ ] Add logging mechanism
-- [ ] Rename project to taskmaster
+- [ ] Add logging mechanism (with config to set min log level)
 - [ ] Add more test coverage
 - [ ] Integrate better logging mechanism
 - [ ] Use enummer for better enum management and parsing

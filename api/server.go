@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	assistant1 "github.com/utsabbera/task-master/core/assistant"
+	assistantcore "github.com/utsabbera/task-master/core/assistant"
 	"github.com/utsabbera/task-master/core/task"
 	"github.com/utsabbera/task-master/pkg/assistant"
 	"github.com/utsabbera/task-master/pkg/idgen"
@@ -29,7 +29,7 @@ func NewServer(cfg ServerConfig) *http.Server {
 	clock := util.NewClock()
 	taskService := task.NewService(repo, idGen, clock)
 	assistant := assistant.NewClient(cfg.Assistant)
-	assistantService := assistant1.NewService(taskService, assistant)
+	assistantService := assistantcore.NewService(taskService, assistant, clock)
 	handler := NewHandler(taskService, assistantService)
 
 	middlewares := []middleware.Middleware{

@@ -584,7 +584,7 @@ func TestHandler_Chat(t *testing.T) {
 		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		input := ChatInput{
-			Text: "Create a new task to finish the report",
+			Message: "Create a new task to finish the report",
 		}
 
 		body, err := json.Marshal(input)
@@ -593,7 +593,7 @@ func TestHandler_Chat(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/chat", bytes.NewReader(body))
 		w := httptest.NewRecorder()
 
-		mockAssistantService.EXPECT().Chat(req.Context(), input.Text).Return("Task created: TASK-123", nil)
+		mockAssistantService.EXPECT().Chat(req.Context(), input.Message).Return("Task created: TASK-123", nil)
 
 		handler.Chat(w, req)
 
@@ -603,7 +603,7 @@ func TestHandler_Chat(t *testing.T) {
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 
-		assert.Contains(t, response.Response, "TASK-123")
+		assert.Contains(t, response.Text, "TASK-123")
 	})
 
 	t.Run("should handle empty assistant", func(t *testing.T) {
@@ -614,7 +614,7 @@ func TestHandler_Chat(t *testing.T) {
 		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		input := ChatInput{
-			Text: "",
+			Message: "",
 		}
 		body, err := json.Marshal(input)
 		require.NoError(t, err)
@@ -635,7 +635,7 @@ func TestHandler_Chat(t *testing.T) {
 		handler := NewHandler(mockTaskService, mockAssistantService)
 
 		input := ChatInput{
-			Text: "Invalid assistant",
+			Message: "Invalid assistant",
 		}
 
 		body, err := json.Marshal(input)
@@ -644,7 +644,7 @@ func TestHandler_Chat(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/chat", bytes.NewReader(body))
 		w := httptest.NewRecorder()
 
-		mockAssistantService.EXPECT().Chat(req.Context(), input.Text).Return("", errors.New("failed to process assistant"))
+		mockAssistantService.EXPECT().Chat(req.Context(), input.Message).Return("", errors.New("failed to process assistant"))
 
 		handler.Chat(w, req)
 

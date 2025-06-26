@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	coreassistant "github.com/utsabbera/task-master/core/assistant"
+	assistantcore "github.com/utsabbera/task-master/core/assistant"
 	"github.com/utsabbera/task-master/core/task"
 	"github.com/utsabbera/task-master/pkg/assistant"
 	"github.com/utsabbera/task-master/pkg/idgen"
@@ -47,7 +47,7 @@ func TestIntegration_Server(t *testing.T) {
 		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
 		assistantClient := assistant.NewClient(assistantConfig)
 		taskService := task.NewService(repo, idGen, clock)
-		chatService := coreassistant.NewService(taskService, assistantClient)
+		chatService := assistantcore.NewService(taskService, assistantClient)
 		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
@@ -86,7 +86,7 @@ func TestIntegration_Server(t *testing.T) {
 		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
 		assistantClient := assistant.NewClient(assistantConfig)
 		taskService := task.NewService(repo, idGen, clock)
-		chatService := coreassistant.NewService(taskService, assistantClient)
+		chatService := assistantcore.NewService(taskService, assistantClient)
 		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
@@ -127,7 +127,7 @@ func TestIntegration_Server(t *testing.T) {
 		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
 		assistantClient := assistant.NewClient(assistantConfig)
 		taskService := task.NewService(repo, idGen, clock)
-		chatService := coreassistant.NewService(taskService, assistantClient)
+		chatService := assistantcore.NewService(taskService, assistantClient)
 		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
@@ -168,7 +168,7 @@ func TestIntegration_Server(t *testing.T) {
 		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
 		assistantClient := assistant.NewClient(assistantConfig)
 		taskService := task.NewService(repo, idGen, clock)
-		chatService := coreassistant.NewService(taskService, assistantClient)
+		chatService := assistantcore.NewService(taskService, assistantClient)
 		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
@@ -219,7 +219,7 @@ func TestIntegration_Server(t *testing.T) {
 		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
 		assistantClient := assistant.NewClient(assistantConfig)
 		taskService := task.NewService(repo, idGen, clock)
-		chatService := coreassistant.NewService(taskService, assistantClient)
+		chatService := assistantcore.NewService(taskService, assistantClient)
 		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
@@ -276,7 +276,7 @@ func TestIntegration_Server(t *testing.T) {
 		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
 		assistantClient := assistant.NewClient(assistantConfig)
 		taskService := task.NewService(repo, idGen, clock)
-		chatService := coreassistant.NewService(taskService, assistantClient)
+		chatService := assistantcore.NewService(taskService, assistantClient)
 		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
@@ -340,7 +340,7 @@ func TestIntegration_Server(t *testing.T) {
 		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
 		assistantClient := assistant.NewClient(assistantConfig)
 		taskService := task.NewService(repo, idGen, clock)
-		chatService := coreassistant.NewService(taskService, assistantClient)
+		chatService := assistantcore.NewService(taskService, assistantClient)
 		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
@@ -389,7 +389,7 @@ func TestIntegration_Server(t *testing.T) {
 		assistantConfig := assistant.Config{BaseURL: testAssistantServer.URL, Model: "echo"}
 		assistantClient := assistant.NewClient(assistantConfig)
 		taskService := task.NewService(repo, idGen, clock)
-		chatService := coreassistant.NewService(taskService, assistantClient)
+		chatService := assistantcore.NewService(taskService, assistantClient)
 		handler := NewHandler(taskService, chatService)
 		router := NewRouter(handler)
 
@@ -397,7 +397,7 @@ func TestIntegration_Server(t *testing.T) {
 		defer ts.Close()
 
 		message := "Create a task titled 'Buy milk' with description 'Get from store'"
-		body, err := json.Marshal(ChatInput{Text: message})
+		body, err := json.Marshal(ChatInput{Message: message})
 		require.NoError(t, err)
 
 		resp, err := http.Post(ts.URL+"/chat", "application/json", bytes.NewReader(body))

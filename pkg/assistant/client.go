@@ -26,6 +26,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/openai/openai-go"
@@ -96,7 +97,7 @@ func (c *client) initParams() {
 
 	for _, fn := range c.funcs {
 		tools = append(tools, openai.ChatCompletionToolParam{
-			Function: fn.def,
+			Function: toOpenAIFunctionDefinitionParam(fn.def),
 		})
 	}
 
@@ -105,9 +106,9 @@ func (c *client) initParams() {
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.SystemMessage(c.systemPrompt()),
 		},
-		Tools:       tools,
-		Seed:        openai.Int(0),
-		Temperature: openai.Float(0.2),
+		Tools: tools,
+		// Seed:        openai.Int(0),
+		// Temperature: openai.Float(0.2),
 	}
 }
 
@@ -115,7 +116,7 @@ func (c *client) systemPrompt() string {
 	return fmt.Sprintf(`
 You are a helpful, concise, and context-aware chat assistant for a %s application - %s. 
 
-Your capabilities are limited to the following tasks:
+Your capabilities are limited to the following tasks (don't answer questions outside of these tasks):
 `+strings.Join(
 		util.Map(
 			util.Values(c.funcs),
@@ -135,6 +136,13 @@ func (c *client) Chat(ctx context.Context, message string) (string, error) {
 }
 
 func (c *client) process(ctx context.Context) (string, error) {
+	message := c.params.Messages[len(c.params.Messages)-1]
+
+	slog.Info("new message",
+		"role", util.Val(message.GetRole()),
+		"content", util.Val(message.GetContent().AsAny().(*string)),
+	)
+
 	completion, err := c.openai.Chat.Completions.New(ctx, c.params)
 	if err != nil {
 		return "", err
@@ -143,6 +151,12 @@ func (c *client) process(ctx context.Context) (string, error) {
 	if len(completion.Choices) > 0 {
 		response := completion.Choices[0].Message
 
+		slog.Debug("chat completion response",
+			"role", response.Role,
+			"content", response.Content,
+			"json", response.RawJSON(),
+		)
+
 		c.params.Messages = append(c.params.Messages, response.ToParam())
 
 		// TODO: handle refusal
@@ -150,6 +164,8 @@ func (c *client) process(ctx context.Context) (string, error) {
 		if len(response.ToolCalls) > 0 {
 			err := c.handleToolCalls(ctx, response.ToolCalls)
 			if err != nil {
+				slog.Error("error handling tool calls", "error", err)
+
 				return "", err
 			}
 
@@ -167,6 +183,8 @@ func (c *client) handleToolCalls(ctx context.Context, calls []openai.ChatComplet
 
 	for _, call := range calls {
 		// TODO: Pass these errors for the AI model to handle
+
+		slog.Info("tool call", "function", call.Function.Name, "args", call.Function.Arguments)
 
 		fn, exists := c.funcs[call.Function.Name]
 		if !exists {

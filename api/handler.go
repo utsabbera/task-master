@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/utsabbera/task-master/core/assistant"
+	assistantcore "github.com/utsabbera/task-master/core/assistant"
 
 	taskcore "github.com/utsabbera/task-master/core/task"
 )
@@ -35,11 +35,11 @@ type Handler interface {
 
 type handler struct {
 	task      taskcore.Service
-	assistant assistant.Service
+	assistant assistantcore.Service
 }
 
 // NewHandler returns a new instance of Handler for task operations.
-func NewHandler(taskService taskcore.Service, assistantService assistant.Service) Handler {
+func NewHandler(taskService taskcore.Service, assistantService assistantcore.Service) Handler {
 	return &handler{
 		task:      taskService,
 		assistant: assistantService,
@@ -249,12 +249,12 @@ func (h *handler) Chat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if input.Text == "" {
+	if input.Message == "" {
 		http.Error(w, "Chat text cannot be empty", http.StatusBadRequest)
 		return
 	}
 
-	response, err := h.assistant.Chat(ctx, input.Text)
+	response, err := h.assistant.Chat(ctx, input.Message)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -264,7 +264,7 @@ func (h *handler) Chat(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	resp := ChatResponse{
-		Response: response,
+		Message: response,
 	}
 
 	if err := json.NewEncoder(w).Encode(resp); err != nil {

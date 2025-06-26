@@ -32,7 +32,7 @@ func TestFunction_NewFunction(t *testing.T) {
 		fn := NewFunction("add", "Adds two numbers", addFunc)
 		args := `{"a":2,"b":3}`
 
-		res, err := fn.Func(ctx, args)
+		res, err := fn.callback(ctx, args)
 		result, ok := res.(AddResult)
 
 		assert.NoError(t, err)
@@ -45,7 +45,7 @@ func TestFunction_NewFunction(t *testing.T) {
 		fn := NewFunction("add", "Adds two numbers", errorFunc)
 		args := `{"a":1,"b":2}`
 
-		_, err := fn.Func(ctx, args)
+		_, err := fn.callback(ctx, args)
 
 		assert.Error(t, err)
 	})
@@ -54,12 +54,12 @@ func TestFunction_NewFunction(t *testing.T) {
 		ctx := context.Background()
 		fn := NewFunction("add", "Adds two numbers", addFunc)
 
-		_, err := fn.Func(ctx, `not-json`)
+		_, err := fn.callback(ctx, `not-json`)
 
 		assert.Error(t, err)
 	})
 
-	t.Run("should generate correct definition", func(t *testing.T) {
+	t.Run("should generate correct DefinitionOf", func(t *testing.T) {
 		fn := NewFunction("add", "Adds two numbers", addFunc)
 
 		assert.Equal(t, "add", fn.def.Name)

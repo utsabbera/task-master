@@ -28,10 +28,10 @@ type TaskInput struct {
 
 // ChatInput represents a natural language message for task management.
 type ChatInput struct {
-	Text string `json:"text"`
+	Message string `json:"message"`
 }
 
 // ChatResponse represents the response to a natural language message.
 type ChatResponse struct {
-	Response string `json:"response"`
+	Message string `json:"message"`
 }

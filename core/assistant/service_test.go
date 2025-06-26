@@ -81,4 +81,6 @@ func TestService_Chat(t *testing.T) {
 		assert.Empty(t, result)
 		assert.ErrorContains(t, err, "task creation failed")
 	})
+
+	// TODO: Fix the testcases
 }
